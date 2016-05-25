@@ -1,0 +1,28 @@
+= SpiceRub
+
+Ruby wrapper for the NASA JPL CSPICE Library.  
+
+== Description
+
+SpiceRub is a wrapper interface for the NASA JPL CSPICE library used for
+various astronomical calculations. The +spicerub+ gem provides
+a direct port of the CSPICE API along with additional Ruby functions
+to make commonly compounded tasks more straightforward. The initial release
+aims to port a useful subset of the various routines offered by the SPICE 
+toolkit, the major focus of which is on routines related to ephemerides
+calculations using various JPL ephemerides files.
+
+== Installation
+
+*TODO*
+
+
+== Features
+
+Kernel Loading Functions (In development)
+
+== License
+
+Copyright (c) 2016, Gaurav Tamba and The Ruby Science Foundation.
+
+All rights reserved.

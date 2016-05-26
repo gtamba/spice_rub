@@ -60,7 +60,7 @@ describe SpiceRub::KernelHandler do
       text_total = @kernel_pool.total(:TEXT)
       expect(text_total).to eq(1)
     end    
-
+  end
 
   context "unloading kernel files" do
     it "successfully unloads a kernel file from the kernel pool specified by its index in the pool" do

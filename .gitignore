@@ -1,3 +1,7 @@
+*.a
+*.o
+*.so
+Makefile
 *.gem
 *.rbc
 /.config

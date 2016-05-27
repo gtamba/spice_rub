@@ -3,37 +3,37 @@
 # Basic tests for KernelHandler class These should load first, as they're
 # essential to performing any meaningful task with the SPICE Toolkit
 #
-# TODO : Add tests for the direct SpiceRub::furnsh(),ktotal(), functions.
+# TODO : Add tests for the direct Spicerub::furnsh(),ktotal(), functions.
 #          These functions won't be directly exposed as of now.
 
 require "spec_helper"
 
-describe SpiceRub::KernelHandler do
+describe Spicerub::KernelHandler do
   before :all do
-    @kernel_pool = SpiceRub::KernelHandler.new
+    @kernel_pool = Spicerub::KernelHandler.new
   end
 
   it "can only be instantiated once" do
-    expect { second_instance = SpiceRub::KernelHandler.new }.to raise_exception
+    expect { second_instance = Spicerub::KernelHandler.new }.to raise_exception
   end
   
   it "raises an exception when loading an invalid kernel file" do
-    expect { @kernel_pool.load("kernels/test/invalid_kernel.txt")}.to raise_exception
+    expect { @kernel_pool.load("data/kernels/invalid_kernel.txt")}.to raise_exception
   end
 
   context "#load" do
     it "successfully loads a text leap second kernel file (.tls)" do
-      kernel1 = @kernel_pool.load("kernels/test/naif0011.tls")
+      kernel1 = @kernel_pool.load("data/kernels/naif0011.tls")
       expect(@kernel_pool.filename(kernel1)).to eq("naif0011.tls")
     end
 
     it "successfully loads a binary SPK kernel file (.bsp)" do
-      kernel2 = @kernel_pool.load("kernels/test/de405_1960_2020.bsp")
+      kernel2 = @kernel_pool.load("data/kernels/de405_1960_2020.bsp")
       expect(@kernel_pool.filename(kernel2)).to eq("de405_1960_2020.bsp")
     end   	
 
     it "successfully loads a binary PCK kernel file (.bpc)" do
-      kernel3 = @kernel_pool.load("kernels/test/moon_pa_de421_1900-2050.bpc")
+      kernel3 = @kernel_pool.load("data/kernels/moon_pa_de421_1900-2050.bpc")
       expect(@kernel_pool.filename(kernel3).to eq("moon_pa_de421_1900-2050.bpc")  
     end
 

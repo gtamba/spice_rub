@@ -3,18 +3,18 @@
 # Basic tests for KernelHandler class These should load first, as they're
 # essential to performing any meaningful task with the SPICE Toolkit
 #
-# TODO : Add tests for the direct Spicerub::furnsh(),ktotal(), functions.
+# TODO : Add tests for the direct SpiceRub::furnsh(),ktotal(), functions.
 #          These functions won't be directly exposed as of now.
 
 require "spec_helper"
 
-describe Spicerub::KernelHandler do
+describe SpiceRub::KernelHandler do
   before :all do
-    @kernel_pool = Spicerub::KernelHandler.new
+    @kernel_pool = SpiceRub::KernelHandler.new
   end
 
   it "can only be instantiated once" do
-    expect { second_instance = Spicerub::KernelHandler.new }.to raise_exception
+    expect { second_instance = SpiceRub::KernelHandler.new }.to raise_exception
   end
   
   it "raises an exception when loading an invalid kernel file" do

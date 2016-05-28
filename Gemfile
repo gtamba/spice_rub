@@ -1,4 +1,4 @@
 source "https://rubygems.org"
 
-gemspec :name => 'spicerub'
+gemspec :name => 'spice_rub'
 

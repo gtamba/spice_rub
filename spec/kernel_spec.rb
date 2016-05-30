@@ -8,72 +8,108 @@
 
 require "spec_helper"
 
-describe SpiceRub::KernelHandler do
-  before :all do
-    @kernel_pool = SpiceRub::KernelHandler.new
+describe SpiceRub::KernelPool do
+  
+  context "when trying to instantiate with constructor"
+    
+    def second_instance
+      SpiceRub::KernelPool.new
+    end
+    
+    expect { second_instance }.to raise_error(NoMethodError)  
+    #TODO : Add article to readme about KernelPool being Singleton
   end
 
-  it "can only be instantiated once" do
-    expect { second_instance = SpiceRub::KernelHandler.new }.to raise_exception
+  def clear_state(test_object)
+    test_object.clear! unless test_object.empty?
+  end
+
+  describe "#load" do
+    let (:kernel_pool) {SpiceRub::KernelPool.instance}
+    
+    context "when input is an invalid kernel" do
+      subject { kernel_pool }
+      before  { clear_state(kernel_pool)}
+      
+      it "raises an ArgumentError exception" do
+        expect { subject.load(TEST_INVALID_KERNEL)}.to raise_exception(ArgumentError)
+      end
+    end
+
+    context "when input is a TLS Kernel" do
+      subject { kernel_pool }
+      before  { clear_state(kernel_pool)
+                kernel_pool.load(TEST_TLS_KERNEL) }
+
+      its(:[], 0) { is_expected.to eq test_pool[:TLS] }
+    end
+
+    context "when input is a PCK Kernel" do
+      subject { kernel_pool }
+      before  { clear_state(kernel_pool)
+                kernel_pool.load(TEST_PCK_KERNEL) }
+
+      its(:[], 0) { is_expected.to eq test_pool[:PCK] }
+    end
+
+    context "when input is a SPK Kernel" do
+      subject { kernel_pool }
+      before  { clear_state(kernel_pool)
+                kernel_pool.load(TEST_SPK_KERNEL) }
+
+      its(:[], 0) { is_expected.to eq test_pool[:SPK] } 
+    end
   end
   
-  it "raises an exception when loading an invalid kernel file" do
-    expect { @kernel_pool.load("data/kernels/invalid_kernel.txt")}.to raise_exception
+  describe "#total" do
+    let (:kernel_pool) {SpiceRub::KernelPool.instance}
+    before { 0.upto(2) do |kernel| { kernel_pool.load(test_kernels[kernel])}}
+
+    context "when category is :ALL or unspecificed" do
+      subject { kernel_pool }
+      
+      its(:total) { is_expected.to eq 3}
+    end
+
+    context "when category is :SPK" do
+      subject { kernel_pool }
+
+      its(:total, :SPK) { is_expected.to eq 1}
+    end
+
+    context "when category is :TLS" do
+      subject { kernel_pool }
+
+      its(:total, :TLS) { is_expected.to eq 1}
+    end
+
+    context "when category is :PCK" do
+      subject { kernel_pool }
+
+      its(:total, :SPK) { is_expected.to eq 1}
+    end
   end
 
-  context "#load" do
-    it "successfully loads a text leap second kernel file (.tls)" do
-      kernel1 = @kernel_pool.load("data/kernels/naif0011.tls")
-      expect(@kernel_pool.filename(kernel1)).to eq("naif0011.tls")
+  describe "#unload!" do
+    context "when unloading a kernel file" do
+      let(:kernel_pool) {SpiceRub::KernelPool.instance}
+      before { clear_state(kernel_pool) 
+               kernel_pool.load(TEST_TLS_KERNEL) }
+
+      its(:unload!) {is_expected.to respond_with 0}                         
+      its(:total) {is_expected.to eq 0}
     end
-
-    it "successfully loads a binary SPK kernel file (.bsp)" do
-      kernel2 = @kernel_pool.load("data/kernels/de405_1960_2020.bsp")
-      expect(@kernel_pool.filename(kernel2)).to eq("de405_1960_2020.bsp")
-    end   	
-
-    it "successfully loads a binary PCK kernel file (.bpc)" do
-      kernel3 = @kernel_pool.load("data/kernels/moon_pa_de421_1900-2050.bpc")
-      expect(@kernel_pool.filename(kernel3).to eq("moon_pa_de421_1900-2050.bpc")  
-    end
-
-    #TODO
-    # Add more tests for different kernel files
   end
-  
-  context "#total" do
-    it "returns the total number of kernel files loaded into the kernel pool" do
-      total = @kernel_pool.total
-      
-      expect(total).to eq(3)
-    end
+    
+  describe "#clear!" do
+    context "when unloading a kernel file" do
+      let(:kernel_pool) {SpiceRub::KernelPool.instance}
+      before { clear_state(kernel_pool) 
+               0.upto(2) do |kernel| { kernel_pool.load(test_kernels[kernel])}}
 
-    it "returns the number of kernel files loaded belonging to the category specified" do
-      spk_total = @kernel_pool.total(:SPK)
-      pck_total = @kernel_pool.total(:PCK)
-      
-      expect(spk_total).to eq(1)
-      expect(pck_total).to eq(1)
-    end
-
-    it "returns the number of text kernel files loaded" do
-      text_total = @kernel_pool.total(:TEXT)
-      expect(text_total).to eq(1)
-    end    
-  end
-
-  context "unloading kernel files" do
-    it "successfully unloads a kernel file from the kernel pool specified by its index in the pool" do
-      status = @kernel_pool.unload(3)
-      
-      expect(status).to be_true
-      expect(@kernel_pool.filename(3)).to be_nil
-      expect(@kernel_pool.total).to eq(2)
-    end
-
-    it "clears the entire kernel pool" do
-      @kernel_pool.clear
-      expect(@kernel_pool.list).to be_nil
+      its(:clear!) {is_expected.to respond_with 0}                         
+      its(:total) {is_expected.to eq 0}
+      its(:empty?){is_expected.to respond_with true}
     end
   end
 end

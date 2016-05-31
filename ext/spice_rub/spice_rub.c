@@ -19,9 +19,6 @@ VALUE furnsh(int argc, VALUE *argv, VALUE self);
 VALUE unload(int argc, VALUE *argv, VALUE self);
 VALUE ktotal(int argc, VALUE *argv, VALUE self);
 
-
-//Global variable that stores any error string and terminates with this string as the exception message
-
 /* This is a thread safety mechanism. CSPICE uses various unix signals and it is prudent to block them while 
  kernels are being loaded to ensure two threads do not interfere. This was inspired by similar blocks in place
  in the naif-spice gem : http://lunaserv.lroc.asu.edu/naif-spice.html
@@ -125,20 +122,24 @@ VALUE unload(int argc, VALUE *argv, VALUE self) {
 
 VALUE ktotal(int argc, VALUE *argv, VALUE self) {
   SpiceInt kernel_count;
-  //VALUE category = argv[0];
-  //const char category_parameter[8];
-  /*
-  if (rb_to_id(category) == rb_intern("ALL")) category_parameter = "ALL"
-  else if (rb_to_id(op) == rb_intern("return") || rb_to_id(op) == rb_intern("s")) return 'S';
-  else if (rb_to_id(op) == rb_intern("overwrite") || rb_to_id(op) == rb_intern("o")) return 'O';
-  else if (rb_to_id(op) == rb_intern("none") || rb_to_id(op) == rb_intern("n")) return 'N';
-  */
-
-  ktotal_c("ALL", &kernel_count);
   
+  if(argc == 0) ktotal_c("ALL", &kernel_count);
+
+  //Else convert Symbol to ID, ID to string if category argument supplied
+  else ktotal_c(rb_id2name(SYM2ID(argv[0])), &kernel_count);
+
   spice_error(SHORT);
 
   return INT2FIX(kernel_count);
+}
+
+VALUE kclear(VALUE self) {
+  
+  kclear_c();
+  
+  if(spice_error(SHORT)) return Qfalse;
+
+  return Qtrue;
 }
 
 void Init_spice_rub(){
@@ -146,6 +147,7 @@ void Init_spice_rub(){
   rb_define_module_function(spicerub_module, "furnsh", furnsh, -1);
   rb_define_module_function(spicerub_module, "ktotal", ktotal, -1);
   rb_define_module_function(spicerub_module, "unload", unload, -1);
+  rb_define_module_function(spicerub_module, "kclear", kclear, -1);
 
   rb_spice_error = rb_define_class("SpiceError", rb_eStandardError);
 }

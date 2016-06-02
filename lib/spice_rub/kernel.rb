@@ -1,4 +1,4 @@
-require 'spice_rub'
+require 'spice_rub.so'
 require 'singleton'
 
 module SpiceRub
@@ -9,7 +9,7 @@ module SpiceRub
     attr_accessor :path
 
     def load(file)
-      kernel_pool |= []
+      kernel_pool ||= []
       # should be Kernel.new
       if @path
         check_path
@@ -22,9 +22,10 @@ module SpiceRub
     def unload!(file)
       if @path
         check_path
-        file = @path.dup << file
-      end
-      SpiceRub::unload(file)
+	    file = @path.dup << file
+	  end
+
+	  SpiceRub::unload(file)
     end
 
     def count(category=:ALL)
@@ -32,37 +33,37 @@ module SpiceRub
     end
 
     def empty?
-      count == 0 ? true : false
+      count.zero?
     end
 
     def check_path
-      #TODO, Add platform independency or remove this (For Windows filesystem)
-      if @path and @path.is_a? String
-      	@path << '/' unless @path[-1] == '/'
-      end	
+      #TODO, Add platform independence or remove this (For Windows filesystem)
+	  if @path and @path.is_a? String
+	    @path << '/' unless @path[-1] == '/'
+	  end	
     end
 
     def clear_path!
       @path = nil
     end
 	  
-    #Kernel Class in under construction	
-    class Kernel
-      attr_reader :path_to , :loaded
+    #SpiceKernel Class is under construction	
+    class SpiceKernel
+  	  attr_reader :path_to , :loaded
       
       def initialize(path)
-      	@path_to = path
-      	@loaded = true
-      end
- 
-      def unload
-        #TODO
-      end
-      
-      def loaded?
-        @loaded
-      end
+        @path_to = path
+	      @loaded = true
+	    end
+	  	
+	    def unload
+	      #TODO
+	    end
+	  	
+	    def loaded?
+	     @loaded
+	    end
     end
-    private_constant :Kernel
+  	private_constant :SpiceKernel
   end	
 end

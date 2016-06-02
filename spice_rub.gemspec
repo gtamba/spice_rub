@@ -9,8 +9,10 @@ Gem::Specification.new do |gem|
   gem.homepage    = 'https://github.com/gau27/spice_rub'
   gem.extensions = ['ext/spice_rub/extconf.rb']
   gem.require_paths = ["lib"]
-  gem.files         = `git ls-files -- ext/nmatrix`.split("\n")
+  gem.files         = `git ls-files -- ext/spice_rub`.split("\n")
   gem.files        += `git ls-files -- lib`.split("\n")
+  #Temp till submodule gets in
+  gem.files        += ["ext/spice_rub/cspice/lib/libcspice.a"]
   gem.test_files    = `git ls-files -- spec`.split("\n")
   gem.required_ruby_version = '>= 1.9'
 

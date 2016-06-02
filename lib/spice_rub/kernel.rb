@@ -19,7 +19,11 @@ module SpiceRub
       file = @path.dup << file if check_path
       SpiceRub::unload(file)
     end
-
+    
+    def clear!
+      SpiceRub::kclear unless self.empty?
+    end
+      
     def count(category=:ALL)
       SpiceRub::ktotal(category)
     end
@@ -29,9 +33,12 @@ module SpiceRub
     end
 
     def check_path
-      if @path and @path.is_a? String?
+      if @path and @path.is_a? String
         @path << '/' unless @path[-1] == '/'
+        return true
       end	
+      
+      false
     end
 
     def clear_path!

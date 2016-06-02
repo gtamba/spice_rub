@@ -4,28 +4,20 @@ require 'singleton'
 module SpiceRub
   class KernelPool
     include Singleton
-	  	
+
     attr_reader :kernel_pool 
     attr_accessor :path
 
     def load(file)
       kernel_pool ||= []
       # should be Kernel.new
-      if @path
-        check_path
-        file = @path.dup << file
-      end
-
+      file = @path.dup << file if check_path
       SpiceRub::furnsh(file)
     end
 
     def unload!(file)
-      if @path
-        check_path
-	    file = @path.dup << file
-	  end
-
-	  SpiceRub::unload(file)
+      file = @path.dup << file if check_path
+      SpiceRub::unload(file)
     end
 
     def count(category=:ALL)
@@ -37,10 +29,9 @@ module SpiceRub
     end
 
     def check_path
-      #TODO, Add platform independence or remove this (For Windows filesystem)
-	  if @path and @path.is_a? String
-	    @path << '/' unless @path[-1] == '/'
-	  end	
+      if @path and @path.is_a? String?
+        @path << '/' unless @path[-1] == '/'
+      end	
     end
 
     def clear_path!
@@ -49,21 +40,20 @@ module SpiceRub
 	  
     #SpiceKernel Class is under construction	
     class SpiceKernel
-  	  attr_reader :path_to , :loaded
+      attr_reader :path_to , :loaded
       
       def initialize(path)
         @path_to = path
-	      @loaded = true
-	    end
-	  	
-	    def unload
-	      #TODO
-	    end
-	  	
-	    def loaded?
-	     @loaded
-	    end
+        @loaded = true
+      end
+      
+      def unload
+      end
+      
+      def loaded?
+      	@loaded
+      end
     end
-  	private_constant :SpiceKernel
+    private_constant :SpiceKernel
   end	
 end

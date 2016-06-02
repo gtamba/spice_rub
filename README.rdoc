@@ -12,23 +12,27 @@ aims to port a useful subset of the various routines offered by the SPICE
 toolkit, the major focus of which is on routines related to ephemerides
 calculations using various JPL ephemerides files.
 
+== Requirements
+
+An existing CSPICE installation or download the toolkit package and simply extract the binary. Find an appropriate installation for your architecture {here} [https://naif.jpl.nasa.gov/naif/toolkit_C.html].
+
 == Installation
 
 Clone repository :
 
   git clone https://github.com/gau27/spice_rub.git
 
-Move CSPICE binary library to the right extension folder :
+Move CSPICE binary library to the right extension folder (must be renamed to libcspice.a) :
 
   mv path/to/cspice.a ext/spice_rub/cspice/lib/libcspice.a
 
-Compile the Gem :
+Compile the gem :
   
   bundle exec rake compile
 
 Try out the code without installing the gem :
 
-  bundle exec rake spec
+  bundle exec rake pry
 
 Install as a gem :
 

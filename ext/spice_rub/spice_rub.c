@@ -4,20 +4,20 @@
 #include <stdbool.h>
 
 //Macros for switch parameters in error message reports
-#define SHORT 0
-#define LONG 1
-#define EXPLAIN 2
-#define ALL 3
+#define SPICE_ERROR_SHORT 0
+#define SPICE_ERROR_LONG 1
+#define SPICE_ERROR_EXPLAIN 2
+#define SPICE_ERROR_ALL 3
 
 //Top level IMPLICIT Declarations
 
 VALUE spicerub_module;
 VALUE rb_spice_error;
 
-
-VALUE furnsh(int argc, VALUE *argv, VALUE self);
-VALUE unload(int argc, VALUE *argv, VALUE self);
-VALUE ktotal(int argc, VALUE *argv, VALUE self);
+static VALUE furnsh(int argc, VALUE *argv, VALUE self);
+static VALUE unload(int argc, VALUE *argv, VALUE self);
+static VALUE ktotal(int argc, VALUE *argv, VALUE self);
+static VALUE kclear(VALUE self);
 
 /* This is a thread safety mechanism. CSPICE uses various unix signals and it is prudent to block them while 
  kernels are being loaded to ensure two threads do not interfere. This was inspired by similar blocks in place
@@ -59,29 +59,28 @@ bool spice_error(int error_detail) {
   SpiceInt buffer_size = 1024;
   char error_message[buffer_size];
 
-
   if (failed_c()) {
     
     switch(error_detail) {
       
-      case ALL :
+      case SPICE_ERROR_ALL :
         //TODO: Neat way to concat all error messages.
-        //reset_c();
+        reset_c();
         break;
 
-      case SHORT :
+      case SPICE_ERROR_SHORT :
         getmsg_c("SHORT", buffer_size, error_message);
         reset_c();
         rb_raise(rb_spice_error, "%s\n", error_message);
         break;
 
-      case LONG :
+      case SPICE_ERROR_LONG :
         getmsg_c("LONG", buffer_size, error_message);
         reset_c();
         rb_raise(rb_spice_error, "%s\n", error_message);
         break;
 
-      case EXPLAIN :
+      case SPICE_ERROR_EXPLAIN :
         getmsg_c("EXPLAIN", buffer_size, error_message);
         reset_c();
         rb_raise(rb_spice_error, "%s\n", error_message);
@@ -96,31 +95,31 @@ bool spice_error(int error_detail) {
   return false;
 }
 
-VALUE furnsh(int argc, VALUE *argv, VALUE self) {
+static VALUE furnsh(int argc, VALUE *argv, VALUE self) {
   sigset_t old_mask = block_signals();
 
   furnsh_c(StringValuePtr(argv[0]));
 
   restore_signals(old_mask);
   
-  if(spice_error(SHORT)) return Qfalse;
+  if(spice_error(SPICE_ERROR_SHORT)) return Qfalse;
 
   return Qtrue;
 }
 
-VALUE unload(int argc, VALUE *argv, VALUE self) {
+static VALUE unload(int argc, VALUE *argv, VALUE self) {
   sigset_t old_mask = block_signals();
 
   unload_c(StringValuePtr(argv[0]));
   
   restore_signals(old_mask);
   
-  if(spice_error(SHORT)) return Qfalse;
+  if(spice_error(SPICE_ERROR_SHORT)) return Qfalse;
 
   return Qtrue;
 }
 
-VALUE ktotal(int argc, VALUE *argv, VALUE self) {
+static VALUE ktotal(int argc, VALUE *argv, VALUE self) {
   SpiceInt kernel_count;
   
   if(argc == 0) ktotal_c("ALL", &kernel_count);
@@ -128,16 +127,16 @@ VALUE ktotal(int argc, VALUE *argv, VALUE self) {
   //Else convert Symbol to ID, ID to string if category argument supplied
   else ktotal_c(rb_id2name(SYM2ID(argv[0])), &kernel_count);
 
-  spice_error(SHORT);
+  spice_error(SPICE_ERROR_SHORT);
 
   return INT2FIX(kernel_count);
 }
 
-VALUE kclear(VALUE self) {
+static VALUE kclear(VALUE self) {
   
   kclear_c();
   
-  if(spice_error(SHORT)) return Qfalse;
+  if(spice_error(SPICE_ERROR_SHORT)) return Qfalse;
 
   return Qtrue;
 }

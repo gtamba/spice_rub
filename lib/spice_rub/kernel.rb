@@ -5,20 +5,25 @@ module SpiceRub
   class KernelPool
     include Singleton
 
-    attr_reader :kernel_pool 
+    attr_reader :pool 
     attr_accessor :path
+    
+    def [] kernel
+      @pool[kernel]
+    end
 
     def load(file)
-      kernel_pool ||= []
+      @pool ||= []
       # should be Kernel.new
       file = @path.dup << file if check_path
-      SpiceRub::furnsh(file)
+      @pool << SpiceKernel.new(file) if SpiceRub::furnsh(file)
+      @pool.length - 1
     end
 
-    def unload!(file)
-      file = @path.dup << file if check_path
-      SpiceRub::unload(file)
-    end
+#    def unload!(file)
+#      file = @path.dup << file if check_path
+#      SpiceRub::unload(file)
+#    end
     
     def clear!
       SpiceRub::kclear unless self.empty?
@@ -55,6 +60,12 @@ module SpiceRub
       end
       
       def unload
+        if SpiceRub::unload(@path_to) 
+          @loaded = false
+          return true
+        else
+          return false
+        end
       end
       
       def loaded?

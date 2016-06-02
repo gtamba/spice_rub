@@ -14,7 +14,7 @@ calculations using various JPL ephemerides files.
 
 == Requirements
 
-An existing CSPICE installation or download the toolkit package and simply extract the binary. Find an appropriate installation for your architecture {here} [https://naif.jpl.nasa.gov/naif/toolkit_C.html].
+An existing CSPICE installation or download the toolkit package and simply extract the binary. Find an appropriate installation for your architecture {here}[https://naif.jpl.nasa.gov/naif/toolkit_C.html].
 
 == Installation
 

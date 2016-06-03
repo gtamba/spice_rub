@@ -11,7 +11,11 @@ module SpiceRub
     def [] kernel
       @pool[kernel]
     end
-
+    
+    def loaded
+      @pool.select {|kernel| kernel.loaded?}
+    end
+    
     def load(file)
       @pool ||= []
       # should be Kernel.new
@@ -26,7 +30,13 @@ module SpiceRub
 #    end
     
     def clear!
-      SpiceRub::kclear unless self.empty?
+      unless self.empty?
+        if SpiceRub::kclear
+          @pool = []
+          return true
+        end
+      end
+      return false
     end
       
     def count(category=:ALL)

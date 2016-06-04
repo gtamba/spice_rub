@@ -5,42 +5,37 @@ module SpiceRub
   class KernelPool
     include Singleton
 
-    attr_reader :pool 
+    attr_reader :pool
     attr_accessor :path
-    
-    def [] kernel
+
+    def [](kernel)
       @pool[kernel]
     end
-    
+
     def loaded
-      @pool.select {|kernel| kernel.loaded?}
+      @pool.select(&:loaded?)
     end
-    
+
     def load(file)
       @pool ||= []
       # should be Kernel.new
       file = @path.dup << file if check_path
-      @pool << SpiceKernel.new(file) if SpiceRub::furnsh(file)
+      @pool << SpiceKernel.new(file) if SpiceRub.furnsh(file)
       @pool.length - 1
     end
 
-#    def unload!(file)
-#      file = @path.dup << file if check_path
-#      SpiceRub::unload(file)
-#    end
-    
     def clear!
-      unless self.empty?
-        if SpiceRub::kclear
+      unless empty?
+        if SpiceRub.kclear
           @pool = []
           return true
         end
       end
-      return false
+      false
     end
-      
-    def count(category=:ALL)
-      SpiceRub::ktotal(category)
+
+    def count(category = :ALL)
+      SpiceRub.ktotal(category)
     end
 
     def empty?
@@ -50,38 +45,39 @@ module SpiceRub
     def check_path
       if @path and @path.is_a? String
         @path << '/' unless @path[-1] == '/'
-        return true
-      end	
-      
-      false
+        true
+      else
+        false
+      end
     end
 
     def clear_path!
       @path = nil
     end
-	  
-    #SpiceKernel Class is under construction	
+
+    private :check_path
+    # SpiceKernel Class is under construction
     class SpiceKernel
-      attr_reader :path_to , :loaded
-      
+      attr_reader :path_to, :loaded
+
       def initialize(path)
         @path_to = path
         @loaded = true
       end
-      
+
       def unload
-        if SpiceRub::unload(@path_to) 
+        if SpiceRub.unload(@path_to)
           @loaded = false
-          return true
+          true
         else
-          return false
+          false
         end
       end
-      
+
       def loaded?
-      	@loaded
+        @loaded
       end
     end
     private_constant :SpiceKernel
-  end	
+  end
 end

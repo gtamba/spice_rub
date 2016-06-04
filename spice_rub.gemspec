@@ -21,4 +21,8 @@ Gem::Specification.new do |gem|
   gem.add_development_dependency 'rake-compiler', '~>0.8'
   gem.add_development_dependency 'rspec', '~>2.14'
   gem.add_development_dependency 'pry', '~>0.10'
+  gem.add_development_dependency 'rubocop', '>= 0.40.0'
+  gem.add_development_dependency 'nmatrix', '>= 0.2.1'
+
+
 end

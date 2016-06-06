@@ -14,7 +14,7 @@ abort "C SPICE Library is not exposed (Incorrect Configuration/Invalid installat
 abort "C SPICE Library is not exposed (Incorrect Configuration/Invalid installation)" unless find_library("cspice", "spkez_c")
 
 $defs.push("-std=gnu99")
-$defs.push("-Wall")
-$defs.push("-Werror")
+#$defs.push("-Wall")
+#$defs.push("-Werror")
 
 create_makefile('spice_rub/spice_rub')

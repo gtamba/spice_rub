@@ -2,22 +2,8 @@
 #include "SpiceUsr.h"
 #include "signal.h"
 #include <stdbool.h>
-
-//Macros for switch parameters in error message reports
-#define SPICE_ERROR_SHORT 0
-#define SPICE_ERROR_LONG 1
-#define SPICE_ERROR_EXPLAIN 2
-#define SPICE_ERROR_ALL 3
-
-//Top level IMPLICIT Declarations
-
-VALUE spicerub_module;
-VALUE rb_spice_error;
-
-static VALUE furnsh(int argc, VALUE *argv, VALUE self);
-static VALUE unload(int argc, VALUE *argv, VALUE self);
-static VALUE ktotal(int argc, VALUE *argv, VALUE self);
-static VALUE kclear(VALUE self);
+#include "spice_rub.h"
+#include "nmatrix.h"
 
 /* This is a thread safety mechanism. CSPICE uses various unix signals and it is prudent to block them while 
  kernels are being loaded to ensure two threads do not interfere. This was inspired by similar blocks in place
@@ -95,10 +81,10 @@ bool spice_error(int error_detail) {
   return false;
 }
 
-static VALUE furnsh(int argc, VALUE *argv, VALUE self) {
+static VALUE furnsh(VALUE self, VALUE kernel) {
   sigset_t old_mask = block_signals();
 
-  furnsh_c(StringValuePtr(argv[0]));
+  furnsh_c(StringValuePtr(kernel));
 
   restore_signals(old_mask);
   
@@ -107,10 +93,10 @@ static VALUE furnsh(int argc, VALUE *argv, VALUE self) {
   return Qtrue;
 }
 
-static VALUE unload(int argc, VALUE *argv, VALUE self) {
+static VALUE unload(VALUE self, VALUE kernel) {
   sigset_t old_mask = block_signals();
 
-  unload_c(StringValuePtr(argv[0]));
+  unload_c(StringValuePtr(kernel));
   
   restore_signals(old_mask);
   
@@ -125,7 +111,7 @@ static VALUE ktotal(int argc, VALUE *argv, VALUE self) {
   if(argc == 0) ktotal_c("ALL", &kernel_count);
 
   //Else convert Symbol to ID, ID to string if category argument supplied
-  else ktotal_c(rb_id2name(SYM2ID(argv[0])), &kernel_count);
+  else ktotal_c(RB_SYM2STR(argv[0]), &kernel_count);
 
   spice_error(SPICE_ERROR_SHORT);
 
@@ -141,12 +127,71 @@ static VALUE kclear(VALUE self) {
   return Qtrue;
 }
 
+//End of Kernel Functions
+
+//Geometry and Co-ordinate Routines
+
+static VALUE latrec(VALUE self, VALUE radius, VALUE longitude, VALUE latitude, VALUE result) {
+
+  latrec_c(NUM2DBL(radius), NUM2DBL(longitude), NUM2DBL(latitude),  NM_STORAGE_DENSE(result)->elements);
+  return Qtrue; 
+  //rb_ary_new3(3, rb_float_new(result[0]), rb_float_new(result[1]), rb_float_new(result[2]));
+}
+
+static VALUE reclat(VALUE self, VALUE rectangular_point) {
+  double radius, longitude, latitude;
+
+  reclat_c(NM_STORAGE_DENSE(rectangular_point)->elements, &radius, &longitude, &latitude);
+  
+  return rb_ary_new3(3, DBL2NUM(radius), DBL2NUM(longitude), DBL2NUM(latitude));
+}
+
+
+//TODO : Test this, current kernel files do not cover this 
+static VALUE lspcn(int argc, VALUE *argv, VALUE self) {
+  double result;
+  
+  if(argc == 3) result = lspcn_c(StringValuePtr(argv[0]), NUM2DBL(argv[1]), StringValuePtr(argv[2]));
+  else result = lspcn_c(StringValuePtr(argv[0]), NUM2DBL(argv[1]), "NONE");   
+  
+  if(spice_error(SPICE_ERROR_SHORT)) return Qnil;
+
+  return DBL2NUM(result); 
+}
+
+//End of Geometry and Co-Ordinate Functions
+
+//Time and Time Conversions Functions
+
+static VALUE str2et(VALUE self, VALUE epoch) {
+  double ephemeris_time;
+
+  str2et_c(StringValuePtr(epoch), &ephemeris_time);
+  
+  if(spice_error(SPICE_ERROR_SHORT)) return Qnil;
+  
+  return DBL2NUM(ephemeris_time);
+}
+
+
 void Init_spice_rub(){
   spicerub_module = rb_define_module("SpiceRub");
-  rb_define_module_function(spicerub_module, "furnsh", furnsh, -1);
+  
+  //Attach Kernel Loading functions to module 
+  rb_define_module_function(spicerub_module, "furnsh", furnsh, 1);
   rb_define_module_function(spicerub_module, "ktotal", ktotal, -1);
-  rb_define_module_function(spicerub_module, "unload", unload, -1);
-  rb_define_module_function(spicerub_module, "kclear", kclear, -1);
+  rb_define_module_function(spicerub_module, "unload", unload, 1);
+  rb_define_module_function(spicerub_module, "kclear", kclear, 0);
+
+  //Attach Geometry-Coordinate functions to module
+  rb_define_module_function(spicerub_module, "latrec", latrec, 4);
+  rb_define_module_function(spicerub_module, "reclat", reclat, 1);
+  rb_define_module_function(spicerub_module, "lspcn", lspcn, -1);
+  rb_define_module_function(spicerub_module, "sincpt", sincpt, -1);
+  rb_define_module_function(spicerub_module, "subpnt", subpnt, -1);
+  //Atttach Time and Time Conversion functions
+  rb_define_module_function(spicerub_module, "str2et", str2et, 1);
+  
 
   rb_spice_error = rb_define_class("SpiceError", rb_eStandardError);
 }

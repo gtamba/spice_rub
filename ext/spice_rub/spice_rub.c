@@ -135,7 +135,6 @@ static VALUE latrec(VALUE self, VALUE radius, VALUE longitude, VALUE latitude, V
 
   latrec_c(NUM2DBL(radius), NUM2DBL(longitude), NUM2DBL(latitude),  NM_STORAGE_DENSE(result)->elements);
   return Qtrue; 
-  //rb_ary_new3(3, rb_float_new(result[0]), rb_float_new(result[1]), rb_float_new(result[2]));
 }
 
 static VALUE reclat(VALUE self, VALUE rectangular_point) {
@@ -150,7 +149,8 @@ static VALUE reclat(VALUE self, VALUE rectangular_point) {
 //TODO : Test this, current kernel files do not cover this 
 static VALUE lspcn(int argc, VALUE *argv, VALUE self) {
   double result;
-  
+
+  //Default aberration correction is "NONE"
   if(argc == 3) result = lspcn_c(StringValuePtr(argv[0]), NUM2DBL(argv[1]), StringValuePtr(argv[2]));
   else result = lspcn_c(StringValuePtr(argv[0]), NUM2DBL(argv[1]), "NONE");   
   
@@ -158,7 +158,94 @@ static VALUE lspcn(int argc, VALUE *argv, VALUE self) {
 
   return DBL2NUM(result); 
 }
+/*
 
+void sincpt_c :
+
+Given an observer and a direction vector defining a ray, compute 
+the surface intercept of the ray on a target body at a specified 
+epoch, optionally corrected for light time and stellar 
+aberration. 
+
+
+void sincpt_c (    ConstSpiceChar      * method,
+                   ConstSpiceChar      * target,
+                   SpiceDouble           et,
+                   ConstSpiceChar      * fixref,
+                   ConstSpiceChar      * abcorr,
+                   ConstSpiceChar      * obsrvr,
+                   ConstSpiceChar      * dref,
+                   ConstSpiceDouble      dvec   [3],
+                   SpiceDouble           spoint [3],
+                   SpiceDouble         * trgepc,
+                   SpiceDouble           srfvec [3],
+                   SpiceBoolean        * found       )
+
+*/
+static VALUE sincpt(int argc, VALUE *argv, VALUE self) {
+  //Only supported method is Ellipsoid, tie it down to a constant for now
+  const char * method = "Ellipsoid";
+  
+  //C containers to pass on to SPICE function
+  
+  /* Input
+   argv[0] -> Target
+   argv[1] -> Ephemeris Time
+   argv[2] -> Fixed Reference
+   argv[3] -> Aberration Correcton *IGNORED* if Arguments passed is 	
+   argv[4] -> Observer Body Name
+   argv[5] -> Reference Frame of Ray's direction vector
+   argv[6] -> Ray's direction Vector
+  */
+  
+  double ray_direction_vector[3] = {0.0,0.0,0.0}; //
+ 
+  //Output parameters
+  SpiceBoolean found;
+  double intercept_epoch;
+  double surface_point[3];
+  double surface_vector[3];
+
+  //Arrays that we return to Ruby
+  VALUE rb_vector = rb_ary_new();
+  VALUE rb_point  = rb_ary_new();
+  
+  //Loop control
+  int count;
+
+  if (found == 0) {
+    rb_raise(rb_eRuntimeError, "Intercept point not found");
+    return Qnil;
+  }
+
+  for(count = 0; count < 3; count++) {
+  	ray_direction_vector[count] = NUM2DBL(RARRAY_PTR(argv[5])[count]);
+  }
+  
+  if(argc == 7) {
+    sincpt_c(method, StringValuePtr(argv[0]), NUM2DBL(argv[1]), StringValuePtr(argv[2]), StringValuePtr(argv[3]), StringValuePtr(argv[4]), StringValuePtr(argv[5]), ray_direction_vector, surface_point, &intercept_epoch, surface_vector, &found);
+  }
+
+  else {
+    sincpt_c(method, StringValuePtr(argv[0]), NUM2DBL(argv[1]), StringValuePtr(argv[2]), "NONE", StringValuePtr(argv[3]), StringValuePtr(argv[4]), ray_direction_vector, surface_point, &intercept_epoch, surface_vector, &found);
+  }
+
+  }
+  if(!found) {
+  	return Qfalse;
+  }
+
+  else if(spice_error(SPICE_ERROR_SHORT)) {
+  	return Qnil;
+  }
+
+  for (count = 0; count < 3; count++) {
+    rb_ary_push(rb_vector, rb_float_new(surface_vector[count]));
+    rb_ary_push(rb_point, rb_float_new(surface_point[count]));
+  }  
+
+  return rb_ary_new3(3, rb_point, rb_vector, DBL2NUM(intercept_epoch));
+}
 //End of Geometry and Co-Ordinate Functions
 
 //Time and Time Conversions Functions
@@ -188,7 +275,7 @@ void Init_spice_rub(){
   rb_define_module_function(spicerub_module, "reclat", reclat, 1);
   rb_define_module_function(spicerub_module, "lspcn", lspcn, -1);
   rb_define_module_function(spicerub_module, "sincpt", sincpt, -1);
-  rb_define_module_function(spicerub_module, "subpnt", subpnt, -1);
+  //rb_define_module_function(spicerub_module, "subpnt", subpnt, -1);
   //Atttach Time and Time Conversion functions
   rb_define_module_function(spicerub_module, "str2et", str2et, 1);
   

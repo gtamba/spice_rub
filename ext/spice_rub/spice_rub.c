@@ -311,9 +311,6 @@ static VALUE subslr(VALUE self, VALUE method, VALUE target, VALUE et, VALUE fixr
   return rb_ary_new3(3, rb_point, rb_vector, DBL2NUM(sub_solar_epoch));
 }
 
-
-
-
 /*
 
 void getfov_c ( SpiceInt        instid,
@@ -326,9 +323,42 @@ void getfov_c ( SpiceInt        instid,
                 SpiceInt      * n,
                 SpiceDouble     bounds [][3] )
 
-* /
+*/
+
+static VALUE getfov(VALUE self, VALUE instid, VALUE room, VALUE shapelen, VALUE framelen) {
+  int count, vector_count;
+  //Maximum size of SPICE ID is 32 chars
+  char shape[32], frame[32];
+  
+  //Upper bound on boundary vectors is uncertain
+  double boundary_sight[3];
+  double boundary_vectors [10][3];
+  
+  VALUE rb_bounds; 
+  VALUE rb_sight_vector = rb_ary_new();
+
+  getfov_c(FIX2INT(instid), FIX2INT(room), FIX2INT(shapelen), FIX2INT(framelen), shape, frame, boundary_sight, &vector_count, boundary_vectors);
+
+  for (count = 0; count < 3; count++) {
+    rb_ary_push(rb_sight_vector, DBL2NUM(boundary_sight[count]));
+  }
+
+  rb_bounds = rb_ary_new2(vector_count);
+
+  for (count = 0; count < vector_count; count++) {
+    rb_ary_push(rb_bounds, rb_ary_new3(3, DBL2NUM(boundary_vectors[count][0]), DBL2NUM(boundary_vectors[count][1]), DBL2NUM(boundary_vectors[count][2])));
+  }
+  
+  if(spice_error(SPICE_ERROR_SHORT)) {
+    return Qnil;
+  }
+
+  return rb_ary_new3(4, RB_STR2SYM(shape), RB_STR2SYM(frame), rb_sight_vector, rb_bounds, vector_count);
+}
 
 //End of Geometry and Co-Ordinate Functions
+
+
 
 //Time and Time Conversions Functions
 
@@ -359,7 +389,8 @@ void Init_spice_rub(){
   rb_define_module_function(spicerub_module, "sincpt", sincpt, 8);
   rb_define_module_function(spicerub_module, "subpnt", subpnt, 6);
   rb_define_module_function(spicerub_module, "subslr", subslr, 6);
-
+  rb_define_module_function(spicerub_module, "getfov", getfov, 4);
+  
   //Atttach Time and Time Conversion functions
   rb_define_module_function(spicerub_module, "str2et", str2et, 1);
   

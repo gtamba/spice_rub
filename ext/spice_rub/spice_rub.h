@@ -32,3 +32,4 @@ static VALUE str2et(VALUE self, VALUE epoch);
 //Macros for simplifying frequent operations
 // Converts a Ruby Symbol to C string
 #define RB_SYM2STR(val) (rb_id2name(SYM2ID(val)))
+#define RB_STR2SYM(val) (ID2SYM(rb_intern(val)))

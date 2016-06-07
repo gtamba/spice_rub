@@ -13,9 +13,9 @@ static VALUE kclear(VALUE self);
 static VALUE latrec(VALUE self, VALUE radius, VALUE longtitude, VALUE latitude, VALUE result);
 static VALUE  lspcn(int argc, VALUE *argv, VALUE self);
 static VALUE reclat(VALUE self, VALUE rectangular_point);
-static VALUE sincpt(int argc, VALUE *argv, VALUE self);
-static VALUE subpnt(int argc, VALUE *argv, VALUE self);
-static VALUE subslr(int argc, VALUE *argv, VALUE self);
+static VALUE sincpt(VALUE self, VALUE method, VALUE target, VALUE et, VALUE fixref, VALUE abcorr, VALUE obsrvr, VALUE dref, VALUE dvec);
+static VALUE subpnt(VALUE self, VALUE method, VALUE target, VALUE et, VALUE fixref, VALUE abcorr, VALUE obsrvr);
+static VALUE subslr(VALUE self, VALUE method, VALUE target, VALUE et, VALUE fixref, VALUE abcorr, VALUE obsrvr);
 
 //Time and Time Conversions Functions
 static VALUE str2et(VALUE self, VALUE epoch);

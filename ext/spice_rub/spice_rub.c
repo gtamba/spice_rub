@@ -182,10 +182,7 @@ void sincpt_c (    ConstSpiceChar      * method,
                    SpiceBoolean        * found       )
 
 */
-static VALUE sincpt(int argc, VALUE *argv, VALUE self) {
-  //Only supported method is Ellipsoid, tie it down to a constant for now
-  const char * method = "Ellipsoid";
-  
+static VALUE sincpt(VALUE self, VALUE method, VALUE target, VALUE et, VALUE fixref, VALUE abcorr, VALUE obsrvr, VALUE dref, VALUE dvec) {
   //C containers to pass on to SPICE function
   
   /* Input
@@ -215,10 +212,10 @@ static VALUE sincpt(int argc, VALUE *argv, VALUE self) {
 
   for(count = 0; count < 3; count++) {
   	//Should be nmatrix?
-    ray_direction_vector[count] = NUM2DBL(RARRAY_PTR(argv[6])[count]);
+    ray_direction_vector[count] = NUM2DBL(RARRAY_PTR(dvec)[count]);
   }
   
-  sincpt_c(method, StringValuePtr(argv[0]), NUM2DBL(argv[1]), StringValuePtr(argv[2]), StringValuePtr(argv[3]), StringValuePtr(argv[4]), StringValuePtr(argv[5]), ray_direction_vector, surface_point, &intercept_epoch, surface_vector, &found);
+  sincpt_c(StringValuePtr(method), StringValuePtr(target), NUM2DBL(et), StringValuePtr(fixref), StringValuePtr(abcorr), StringValuePtr(obsrvr), StringValuePtr(dref), ray_direction_vector, surface_point, &intercept_epoch, surface_vector, &found);
 
   if(!found) {
   	return Qfalse;
@@ -250,18 +247,7 @@ static VALUE sincpt(int argc, VALUE *argv, VALUE self) {
 
 */
 
-static VALUE subpnt(int argc, VALUE *argv, VALUE self) {
-  //C containers to pass on to SPICE function
-  
-  /* Input
-   argv[0] -> Method
-   argv[1] -> Target
-   argv[2] -> Ephemeris Time
-   argv[3] -> Fixed Reference Object   
-   argv[4] -> Abb. Correction
-   argv[5] -> Observer
-  */
-
+static VALUE subpnt(VALUE self, VALUE method, VALUE target, VALUE et, VALUE fixref, VALUE abcorr, VALUE obsrvr) {
   //loop control
   int count;
 
@@ -274,7 +260,7 @@ static VALUE subpnt(int argc, VALUE *argv, VALUE self) {
   VALUE rb_vector = rb_ary_new();
   VALUE rb_point  = rb_ary_new();
 
-  subpnt_c(StringValuePtr(argv[0]), StringValuePtr(argv[1]), NUM2DBL(argv[2]), StringValuePtr(argv[3]), StringValuePtr(argv[4]), StringValuePtr(argv[5]), surface_point, &observer_epoch, surface_vector);
+  subpnt_c(StringValuePtr(method), StringValuePtr(target), NUM2DBL(et), StringValuePtr(fixref), StringValuePtr(abcorr), StringValuePtr(obsrvr), surface_point, &observer_epoch, surface_vector);
 
   if(spice_error(SPICE_ERROR_SHORT)) return Qnil;
 
@@ -300,18 +286,7 @@ static VALUE subpnt(int argc, VALUE *argv, VALUE self) {
 
 */
 
-static VALUE subslr(int argc, VALUE *argv, VALUE self) {
-  //C containers to pass on to SPICE function
-  
-  /* Input
-   argv[0] -> Method
-   argv[1] -> Target
-   argv[2] -> Ephemeris Time
-   argv[3] -> Fixed Reference Object   
-   argv[4] -> Abb. Correction
-   argv[5] -> Observer
-  */
-
+static VALUE subslr(VALUE self, VALUE method, VALUE target, VALUE et, VALUE fixref, VALUE abcorr, VALUE obsrvr) {
   //loop control
   int count;
 
@@ -324,7 +299,7 @@ static VALUE subslr(int argc, VALUE *argv, VALUE self) {
   VALUE rb_vector = rb_ary_new();
   VALUE rb_point  = rb_ary_new();
 
-  subslr_c(StringValuePtr(argv[0]), StringValuePtr(argv[1]), NUM2DBL(argv[2]), StringValuePtr(argv[3]), StringValuePtr(argv[4]), StringValuePtr(argv[5]), surface_point, &sub_solar_epoch, surface_vector);
+  subslr_c(StringValuePtr(method), StringValuePtr(target), NUM2DBL(et), StringValuePtr(fixref), StringValuePtr(abcorr), StringValuePtr(obsrvr), surface_point, &sub_solar_epoch, surface_vector);
 
   if(spice_error(SPICE_ERROR_SHORT)) return Qnil;
 
@@ -335,6 +310,23 @@ static VALUE subslr(int argc, VALUE *argv, VALUE self) {
 
   return rb_ary_new3(3, rb_point, rb_vector, DBL2NUM(sub_solar_epoch));
 }
+
+
+
+
+/*
+
+void getfov_c ( SpiceInt        instid,
+                SpiceInt        room,
+                SpiceInt        shapelen,
+                SpiceInt        framelen,
+                SpiceChar     * shape,
+                SpiceChar     * frame,
+                SpiceDouble     bsight [3],
+                SpiceInt      * n,
+                SpiceDouble     bounds [][3] )
+
+* /
 
 //End of Geometry and Co-Ordinate Functions
 
@@ -364,9 +356,9 @@ void Init_spice_rub(){
   rb_define_module_function(spicerub_module, "latrec", latrec, 4);
   rb_define_module_function(spicerub_module, "reclat", reclat, 1);
   rb_define_module_function(spicerub_module, "lspcn", lspcn, -1);
-  rb_define_module_function(spicerub_module, "sincpt", sincpt, -1);
-  rb_define_module_function(spicerub_module, "subpnt", subpnt, -1);
-  rb_define_module_function(spicerub_module, "subslr", subslr, -1);
+  rb_define_module_function(spicerub_module, "sincpt", sincpt, 8);
+  rb_define_module_function(spicerub_module, "subpnt", subpnt, 6);
+  rb_define_module_function(spicerub_module, "subslr", subslr, 6);
 
   //Atttach Time and Time Conversion functions
   rb_define_module_function(spicerub_module, "str2et", str2et, 1);

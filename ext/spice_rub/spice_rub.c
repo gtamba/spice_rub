@@ -356,6 +356,15 @@ static VALUE getfov(VALUE self, VALUE instid, VALUE room, VALUE shapelen, VALUE 
   return rb_ary_new3(4, RB_STR2SYM(shape), RB_STR2SYM(frame), rb_sight_vector, rb_bounds, vector_count);
 }
 
+static VALUE recsph(VALUE self, VALUE rectangular) {
+  double radius, 
+         colatitude, 
+         longitude;  
+
+  recsph_c(NM_STORAGE_DENSE(rectangular)->elements, &radius, &colatitude, &longitude);
+
+  return rb_ary_new3(3, DBL2NUM(radius), DBL2NUM(colatitude), DBL2NUM(longitude));
+}
 //End of Geometry and Co-Ordinate Functions
 
 
@@ -390,6 +399,8 @@ void Init_spice_rub(){
   rb_define_module_function(spicerub_module, "subpnt", subpnt, 6);
   rb_define_module_function(spicerub_module, "subslr", subslr, 6);
   rb_define_module_function(spicerub_module, "getfov", getfov, 4);
+  rb_define_module_function(spicerub_module, "recsph", recsph, 1);
+
   
   //Atttach Time and Time Conversion functions
   rb_define_module_function(spicerub_module, "str2et", str2et, 1);

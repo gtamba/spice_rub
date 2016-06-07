@@ -16,6 +16,7 @@ static VALUE reclat(VALUE self, VALUE rectangular_point);
 static VALUE sincpt(VALUE self, VALUE method, VALUE target, VALUE et, VALUE fixref, VALUE abcorr, VALUE obsrvr, VALUE dref, VALUE dvec);
 static VALUE subpnt(VALUE self, VALUE method, VALUE target, VALUE et, VALUE fixref, VALUE abcorr, VALUE obsrvr);
 static VALUE subslr(VALUE self, VALUE method, VALUE target, VALUE et, VALUE fixref, VALUE abcorr, VALUE obsrvr);
+static VALUE recsph(VALUE self, VALUE rectangular);
 
 //Time and Time Conversions Functions
 static VALUE str2et(VALUE self, VALUE epoch);

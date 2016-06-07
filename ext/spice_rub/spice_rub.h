@@ -13,6 +13,9 @@ static VALUE kclear(VALUE self);
 static VALUE latrec(VALUE self, VALUE radius, VALUE longtitude, VALUE latitude, VALUE result);
 static VALUE  lspcn(int argc, VALUE *argv, VALUE self);
 static VALUE reclat(VALUE self, VALUE rectangular_point);
+static VALUE sincpt(int argc, VALUE *argv, VALUE self);
+static VALUE subpnt(int argc, VALUE *argv, VALUE self);
+static VALUE subslr(int argc, VALUE *argv, VALUE self);
 
 //Time and Time Conversions Functions
 static VALUE str2et(VALUE self, VALUE epoch);
@@ -26,7 +29,6 @@ static VALUE str2et(VALUE self, VALUE epoch);
 #define SPICE_ERROR_EXPLAIN 2
 #define SPICE_ERROR_ALL 3
 
-
-
 //Macros for simplifying frequent operations
-#define RB_SYM2STR(val)        (rb_id2name(SYM2ID(val)))
+// Converts a Ruby Symbol to C string
+#define RB_SYM2STR(val) (rb_id2name(SYM2ID(val)))

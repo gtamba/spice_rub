@@ -286,6 +286,55 @@ static VALUE subpnt(int argc, VALUE *argv, VALUE self) {
   return rb_ary_new3(3, rb_point, rb_vector, DBL2NUM(observer_epoch));
 }
 
+/*
+
+   void subslr_c ( ConstSpiceChar       * method,
+                   ConstSpiceChar       * target,
+                   SpiceDouble            et,
+                   ConstSpiceChar       * fixref,
+                   ConstSpiceChar       * abcorr,
+                   ConstSpiceChar       * obsrvr,
+                   SpiceDouble            spoint [3],
+                   SpiceDouble          * trgepc,
+                   SpiceDouble            srfvec [3]
+
+*/
+
+static VALUE subslr(int argc, VALUE *argv, VALUE self) {
+  //C containers to pass on to SPICE function
+  
+  /* Input
+   argv[0] -> Method
+   argv[1] -> Target
+   argv[2] -> Ephemeris Time
+   argv[3] -> Fixed Reference Object   
+   argv[4] -> Abb. Correction
+   argv[5] -> Observer
+  */
+
+  //loop control
+  int count;
+
+  //Output
+  double sub_solar_epoch,
+         surface_point[3],
+         surface_vector[3];
+
+  //Arrays that we return to Ruby
+  VALUE rb_vector = rb_ary_new();
+  VALUE rb_point  = rb_ary_new();
+
+  subslr_c(StringValuePtr(argv[0]), StringValuePtr(argv[1]), NUM2DBL(argv[2]), StringValuePtr(argv[3]), StringValuePtr(argv[4]), StringValuePtr(argv[5]), surface_point, &sub_solar_epoch, surface_vector);
+
+  if(spice_error(SPICE_ERROR_SHORT)) return Qnil;
+
+  for (count = 0; count < 3; count++) {
+    rb_ary_push(rb_vector, DBL2NUM(surface_vector[count]));
+    rb_ary_push(rb_point, DBL2NUM(surface_point[count]));
+  }  
+
+  return rb_ary_new3(3, rb_point, rb_vector, DBL2NUM(sub_solar_epoch));
+}
 
 //End of Geometry and Co-Ordinate Functions
 
@@ -317,7 +366,7 @@ void Init_spice_rub(){
   rb_define_module_function(spicerub_module, "lspcn", lspcn, -1);
   rb_define_module_function(spicerub_module, "sincpt", sincpt, -1);
   rb_define_module_function(spicerub_module, "subpnt", subpnt, -1);
-  
+  rb_define_module_function(spicerub_module, "subslr", subslr, -1);
 
   //Atttach Time and Time Conversion functions
   rb_define_module_function(spicerub_module, "str2et", str2et, 1);

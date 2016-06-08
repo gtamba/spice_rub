@@ -365,6 +365,88 @@ static VALUE recsph(VALUE self, VALUE rectangular) {
 
   return rb_ary_new3(3, DBL2NUM(radius), DBL2NUM(colatitude), DBL2NUM(longitude));
 }
+
+static VALUE sphrec(VALUE self, VALUE radius, VALUE colatitude, VALUE longitude, VALUE rectangular) {
+  sphrec_c(NUM2DBL(radius), NUM2DBL(colatitude), NUM2DBL(longitude), NM_STORAGE_DENSE(rectangular)->elements);
+  
+  return rectangular;
+}
+
+/*
+SpiceDouble phaseq_c ( SpiceDouble       et,
+                       ConstSpiceChar  * target,
+                       ConstSpiceChar  * illmn,
+                       ConstSpiceChar  * obsrvr,
+                       ConstSpiceChar  * abcorr )
+
+*/
+static VALUE phaseq(VALUE self, VALUE et, VALUE target, VALUE illmn, VALUE obsrvr, VALUE abcorr) {
+  double phase_angle;
+
+  phase_angle = phaseq_c(NUM2DBL(et), RB_SYM2STR(target), RB_SYM2STR(illmn), RB_SYM2STR(obsrvr), RB_SYM2STR(abcorr));
+
+  if(spice_error(SPICE_ERROR_SHORT)) return Qnil;
+
+  return DBL2NUM(phase_angle);
+}
+
+static VALUE recrad(VALUE self, VALUE rectangular) {
+  double range,
+         right_ascension,
+         declination;
+
+  recrad_c(NM_STORAGE_DENSE(rectangular)->elements, &range, &right_ascension, &declination);
+
+  return rb_ary_new3(3, DBL2NUM(range), DBL2NUM(right_ascension), DBL2NUM(declination));
+}
+
+static VALUE radrec(VALUE self, VALUE range, VALUE right_ascension, VALUE declination, VALUE rectangular) {
+  radrec_c(NUM2DBL(range), NUM2DBL(right_ascension), NUM2DBL(declination), NM_STORAGE_DENSE(rectangular)->elements);
+
+  return rectangular;
+}
+
+static VALUE recgeo(VALUE self, VALUE rectangular, VALUE radius_equatorial, VALUE flattening) {
+  double longitude,
+         latitude,
+         altitude;
+
+  recgeo_c(NM_STORAGE_DENSE(rectangular)->elements, NUM2DBL(radius_equatorial), NUM2DBL(flattening), &longitude, &latitude, &altitude);       
+  
+  if(spice_error(SPICE_ERROR_SHORT)) return Qnil;
+
+  return rb_ary_new3(3, DBL2NUM(longitude), DBL2NUM(latitude), DBL2NUM(altitude));
+}
+
+static VALUE georec(VALUE self, VALUE longitude, VALUE latitude, VALUE altitude, VALUE radius_equatorial, VALUE flattening, VALUE rectangular) {
+  georec_c(NUM2DBL(longitude), NUM2DBL(latitude), NUM2DBL(altitude), NUM2DBL(radius_equatorial), NUM2DBL(flattening), NM_STORAGE_DENSE(rectangular)->elements);
+  
+  if(spice_error(SPICE_ERROR_SHORT)) return Qnil;
+
+  return rectangular;
+}
+
+static VALUE recpgr(VALUE self, VALUE body, VALUE rectangular, VALUE radius_equatorial, VALUE flattening) {
+  double longitude,
+         latitude,
+         altitude;
+
+  recpgr_c(RB_SYM2STR(body), NM_STORAGE_DENSE(rectangular)->elements, NUM2DBL(radius_equatorial), NUM2DBL(flattening), &longitude, &latitude, &altitude);
+  
+  if(spice_error(SPICE_ERROR_SHORT)) return Qnil;
+
+  return rb_ary_new3(3, DBL2NUM(longitude), DBL2NUM(latitude), DBL2NUM(altitude));
+}
+
+static VALUE pgrrec(VALUE self, VALUE body, VALUE longitude, VALUE latitude, VALUE altitude, VALUE radius_equatorial, VALUE flattening, VALUE rectangular) {
+  pgrrec_c(RB_SYM2STR(body), NUM2DBL(radius_equatorial), NUM2DBL(flattening), NUM2DBL(longitude), NUM2DBL(latitude), NUM2DBL(altitude), NM_STORAGE_DENSE(rectangular)->elements);
+
+  if(spice_error(SPICE_ERROR_SHORT)) return Qnil;
+
+  return rectangular;
+}
+
+
 //End of Geometry and Co-Ordinate Functions
 
 
@@ -383,27 +465,35 @@ static VALUE str2et(VALUE self, VALUE epoch) {
 
 
 void Init_spice_rub(){
-  spicerub_module = rb_define_module("SpiceRub");
+  spicerub_top_module = rb_define_module("SpiceRub");
+  spicerub_nested_module = rb_define_module_under(spicerub_top_module, "Native");
   
   //Attach Kernel Loading functions to module 
-  rb_define_module_function(spicerub_module, "furnsh", furnsh, 1);
-  rb_define_module_function(spicerub_module, "ktotal", ktotal, -1);
-  rb_define_module_function(spicerub_module, "unload", unload, 1);
-  rb_define_module_function(spicerub_module, "kclear", kclear, 0);
+  rb_define_module_function(spicerub_nested_module, "furnsh", furnsh, 1);
+  rb_define_module_function(spicerub_nested_module, "ktotal", ktotal, -1);
+  rb_define_module_function(spicerub_nested_module, "unload", unload, 1);
+  rb_define_module_function(spicerub_nested_module, "kclear", kclear, 0);
 
   //Attach Geometry-Coordinate functions to module
-  rb_define_module_function(spicerub_module, "latrec", latrec, 4);
-  rb_define_module_function(spicerub_module, "reclat", reclat, 1);
-  rb_define_module_function(spicerub_module, "lspcn", lspcn, -1);
-  rb_define_module_function(spicerub_module, "sincpt", sincpt, 8);
-  rb_define_module_function(spicerub_module, "subpnt", subpnt, 6);
-  rb_define_module_function(spicerub_module, "subslr", subslr, 6);
-  rb_define_module_function(spicerub_module, "getfov", getfov, 4);
-  rb_define_module_function(spicerub_module, "recsph", recsph, 1);
+  rb_define_module_function(spicerub_nested_module, "latrec", latrec, 4);
+  rb_define_module_function(spicerub_nested_module, "reclat", reclat, 1);
+  rb_define_module_function(spicerub_nested_module, "lspcn", lspcn, -1);
+  rb_define_module_function(spicerub_nested_module, "sincpt", sincpt, 8);
+  rb_define_module_function(spicerub_nested_module, "subpnt", subpnt, 6);
+  rb_define_module_function(spicerub_nested_module, "subslr", subslr, 6);
+  rb_define_module_function(spicerub_nested_module, "getfov", getfov, 4);
+  rb_define_module_function(spicerub_nested_module, "recsph", recsph, 1);
+  rb_define_module_function(spicerub_nested_module, "sphrec", sphrec, 4);
+  rb_define_module_function(spicerub_nested_module, "phaseq", phaseq, 5);
+  rb_define_module_function(spicerub_nested_module, "recrad", recrad, 1);
+  rb_define_module_function(spicerub_nested_module, "radrec", radrec, 4);
+  rb_define_module_function(spicerub_nested_module, "recgeo", recgeo, 3);
+  rb_define_module_function(spicerub_nested_module, "georec", georec, 6);
+  rb_define_module_function(spicerub_nested_module, "recpgr", recpgr, 4);
+  rb_define_module_function(spicerub_nested_module, "pgrrec", pgrrec, 7);
 
-  
   //Atttach Time and Time Conversion functions
-  rb_define_module_function(spicerub_module, "str2et", str2et, 1);
+  rb_define_module_function(spicerub_nested_module, "str2et", str2et, 1);
   
 
   rb_spice_error = rb_define_class("SpiceError", rb_eStandardError);

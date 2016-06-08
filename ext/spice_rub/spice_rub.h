@@ -1,6 +1,7 @@
 //Top level IMPLICIT Declarations
 
-VALUE spicerub_module;
+VALUE spicerub_top_module;
+VALUE spicerub_nested_module;
 VALUE rb_spice_error;
 
 //Kernel Loading Functions
@@ -17,6 +18,14 @@ static VALUE sincpt(VALUE self, VALUE method, VALUE target, VALUE et, VALUE fixr
 static VALUE subpnt(VALUE self, VALUE method, VALUE target, VALUE et, VALUE fixref, VALUE abcorr, VALUE obsrvr);
 static VALUE subslr(VALUE self, VALUE method, VALUE target, VALUE et, VALUE fixref, VALUE abcorr, VALUE obsrvr);
 static VALUE recsph(VALUE self, VALUE rectangular);
+static VALUE sphrec(VALUE self, VALUE radius, VALUE colatitude, VALUE longitude, VALUE rectangular);
+static VALUE phaseq(VALUE self, VALUE et, VALUE target, VALUE illmn, VALUE obsrvr, VALUE abcorr);
+static VALUE recrad(VALUE self, VALUE rectangular);
+static VALUE radrec(VALUE self, VALUE range, VALUE right_ascension, VALUE declination, VALUE rectangular);
+static VALUE recgeo(VALUE self, VALUE rectangular, VALUE radius_equatorial, VALUE flattening);
+static VALUE georec(VALUE self, VALUE longitude, VALUE latitude, VALUE altitude, VALUE radius_equatorial, VALUE flattening, VALUE rectangular);
+static VALUE recpgr(VALUE self, VALUE body, VALUE rectangular, VALUE radius_equatorial, VALUE flattening);
+static VALUE pgrrec(VALUE self, VALUE body, VALUE longitude, VALUE latitude, VALUE altitude, VALUE radius_equatorial, VALUE flattening, VALUE rectangular);
 
 //Time and Time Conversions Functions
 static VALUE str2et(VALUE self, VALUE epoch);

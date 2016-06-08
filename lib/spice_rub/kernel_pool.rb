@@ -1,3 +1,16 @@
+#--
+# = SpiceRub
+#
+# A wrapper to the SPICE TOOLKIT for space and astronomomical computation in Ruby.
+#
+#
+#
+# == kernel_pool.rb
+#
+# KernelPool class, the Ruby interface to kernel loading functions such as
+# furnsh_c , unload_c, ktotal_c, kclear_c
+#++
+
 require 'spice_rub.so'
 require 'singleton'
 
@@ -20,13 +33,13 @@ module SpiceRub
       @pool ||= []
       # should be Kernel.new
       file = @path.dup << file if check_path
-      @pool << SpiceKernel.new(file) if SpiceRub.furnsh(file)
+      @pool << SpiceKernel.new(file) if SpiceRub::Native.furnsh(file)
       @pool.length - 1
     end
 
     def clear!
       unless empty?
-        if SpiceRub.kclear
+        if SpiceRub::Native.kclear
           @pool = []
           return true
         end
@@ -35,7 +48,7 @@ module SpiceRub
     end
 
     def count(category = :ALL)
-      SpiceRub.ktotal(category)
+      SpiceRub::Native.ktotal(category)
     end
 
     def empty?
@@ -43,7 +56,7 @@ module SpiceRub
     end
 
     def check_path
-      if @path and @path.is_a? String
+      if @path && @path.is_a?(String)
         @path << '/' unless @path[-1] == '/'
         true
       else
@@ -66,7 +79,7 @@ module SpiceRub
       end
 
       def unload
-        if SpiceRub.unload(@path_to)
+        if SpiceRub::Native.unload(@path_to)
           @loaded = false
           true
         else

@@ -1,13 +1,14 @@
 #--
 # = SpiceRub
 #
-# A wrapper to the SPICE TOOLKIT for space and astronomomical computation in Ruby.
-#
+# A wrapper to the SPICE TOOLKIT for space and astronomomical
+# computation in Ruby.
 #
 #
 # == kernel_pool.rb
 #
-# KernelPool class, the Ruby interface to kernel loading functions such as
+# Contains the KernelPool class, SpiceKernel(nested within KernelPool) which is
+# the Ruby interface to kernel loading functions such as
 # furnsh_c , unload_c, ktotal_c, kclear_c
 #++
 
@@ -15,6 +16,8 @@ require 'spice_rub.so'
 require 'singleton'
 
 module SpiceRub
+  # KernelPool class, the Ruby interface to kernel loading functions such as
+  # furnsh_c , unload_c, ktotal_c, kclear_c
   class KernelPool
     include Singleton
 
@@ -31,7 +34,7 @@ module SpiceRub
 
     def load(file)
       @pool ||= []
-      # should be Kernel.new
+
       file = @path.dup << file if check_path
       @pool << SpiceKernel.new(file) if SpiceRub::Native.furnsh(file)
       @pool.length - 1
@@ -69,7 +72,9 @@ module SpiceRub
     end
 
     private :check_path
-    # SpiceKernel Class is under construction
+
+    # SpiceKernel class, a helper object used by KernelPool to track
+    # kernel files, is not visible outside KernelPool.
     class SpiceKernel
       attr_reader :path_to, :loaded
 

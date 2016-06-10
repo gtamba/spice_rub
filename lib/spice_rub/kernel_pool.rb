@@ -24,14 +24,69 @@ module SpiceRub
     attr_reader :pool
     attr_accessor :path
 
+    #
+    # call-seq:
+    #     [kernel] -> SpiceKernel
+    #
+    # Returns a SpiceKernel (loaded/unloaded) from the Kernel Pool 
+    #
+    # * *Arguments* :
+    #   - +kernel+ -> The 0-based index of the kernel in the pool
+    #
+    # * *Returns* :
+    #   - SpiceKernel corresponding to kernel index.
+    #
+    # Examples :-
+    #   kernel_pool = KernelPool.instance
+    #   
+    #   #Load a kernel file
+    #   
+    #   kernel_pool[0]
+    #     => #<SpiceRub::KernelPool::SpiceKernel:0xMEM @loaded=true, @path_to="spec/data/kernels/naif0011.tls">
+    #
     def [](kernel)
       @pool[kernel]
     end
-
+    
+    #
+    # call-seq:
+    #     loaded -> List of SpiceKernel objects
+    #
+    # Returns the list of loaded kernels present in the kernel pool
+    #
+    # Examples :-
+    #   kernel_pool.pool
+    #     => [#<SpiceRub::KernelPool::SpiceKernel:0x0MEM1 @loaded=true, @path_to="spec/data/kernels/naif0011.tls">,
+    #         #<SpiceRub::KernelPool::SpiceKernel:0x0MEM2 @loaded=false, @path_to="spec/data/kernels/moon_pa_de421_1900-2050.bpc">,
+    #         #<SpiceRub::KernelPool::SpiceKernel:0x0MEM3 @loaded=true, @path_to="spec/data/kernels/de405_1960_2020.bsp">]
+    #
+    #   kernel_pool.loaded
+    #     => [#<SpiceRub::KernelPool::SpiceKernel:0x0000000142ed60 @loaded=true, @path_to="spec/data/kernels/naif0011.tls">,
+    #         #<SpiceRub::KernelPool::SpiceKernel:0x00000000a42ef0 @loaded=true, @path_to="spec/data/kernels/de405_1960_2020.bsp">]
+    #
     def loaded
       @pool.select(&:loaded?)
     end
 
+    #
+    # call-seq:
+    #     load -> FixNum
+    #
+    # Returns a FixNum corresponding to the index of the kernel 
+    # in the kernel pool if the load is successful. Ruby interface to furnsh_c from
+    # the SPICE toolkit.
+    #
+    # * *Arguments* :
+    #   - +file+ -> The relative file path of the kernel if path is nil, else the filename 
+    #               
+    # Examples :-
+    #   kernel_pool = KernelPool.instance
+    #   
+    #   kernel_pool.path = "spec/data/kernels/"
+    #   
+    #   kernel_pool.load("naif0011.tls")
+    #     => 0
+    #
     def load(file)
       @pool ||= []
 
@@ -40,6 +95,20 @@ module SpiceRub
       @pool.length - 1
     end
 
+    #
+    # call-seq:
+    #     clear -> TrueClass/FalseClass
+    # 
+    # Clears the kernel pool and returns true if successful.
+    # Ruby interface to kclear_c from the SPICE Toolkit.
+    #        
+    # Examples :-
+    #   kernel_pool.clear!
+    #     => true
+    #   
+    #   kernel_pool.pool
+    #     => []
+    #
     def clear!
       unless empty?
         if SpiceRub::Native.kclear
@@ -50,6 +119,22 @@ module SpiceRub
       false
     end
 
+    #
+    # call-seq:
+    #     count -> FixNum
+    # 
+    # Returns the number of loaded kernels in the kernel pool
+    # Ruby interface for ktotal_c from the SPICE Toolkit.        
+    #
+    # Examples :-
+    #   kernel_pool.pool
+    #     => [#<SpiceRub::KernelPool::SpiceKernel:0x0000000142ed60 @loaded=true, @path_to="spec/data/kernels/naif0011.tls">,
+    #         #<SpiceRub::KernelPool::SpiceKernel:0x00000000aee980 @loaded=true, @path_to="spec/data/kernels/moon_pa_de421_1900-2050.bpc">,
+    #         #<SpiceRub::KernelPool::SpiceKernel:0x00000000a42ef0 @loaded=true, @path_to="spec/data/kernels/de405_1960_2020.bsp">]
+    #
+    #   kernel_pool.count
+    #     => 3
+    #
     def count(category = :ALL)
       SpiceRub::Native.ktotal(category)
     end

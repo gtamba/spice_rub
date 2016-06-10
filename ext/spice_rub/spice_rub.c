@@ -131,10 +131,12 @@ static VALUE kclear(VALUE self) {
 
 //Geometry and Co-ordinate Routines
 
-static VALUE latrec(VALUE self, VALUE radius, VALUE longitude, VALUE latitude, VALUE result) {
-
-  latrec_c(NUM2DBL(radius), NUM2DBL(longitude), NUM2DBL(latitude),  NM_STORAGE_DENSE(result)->elements);
-  return result; 
+static VALUE latrec(VALUE self, VALUE radius, VALUE longitude, VALUE latitude) {
+  double vector[3];
+  
+  latrec_c(NUM2DBL(radius), NUM2DBL(longitude), NUM2DBL(latitude),  vector);
+  
+  return rb_nmatrix_dense_create(FLOAT64, (size_t *) VECTOR_SHAPE, 2, (void *) vector, 3);
 }
 
 static VALUE reclat(VALUE self, VALUE rectangular_point) {
@@ -194,9 +196,6 @@ static VALUE sincpt(VALUE self, VALUE method, VALUE target, VALUE et, VALUE fixr
    argv[5] -> Reference Frame of Ray's direction vector
    argv[6] -> Ray's direction Vector
   */
-  
-  double ray_direction_vector[3] = {0.0,0.0,0.0}; //
- 
   //Output parameters
   SpiceBoolean found;
   double intercept_epoch,
@@ -204,18 +203,10 @@ static VALUE sincpt(VALUE self, VALUE method, VALUE target, VALUE et, VALUE fixr
          surface_vector[3];
 
   //Arrays that we return to Ruby
-  VALUE rb_vector = rb_ary_new();
-  VALUE rb_point  = rb_ary_new();
-  
-  //Loop control
-  int count;
+  VALUE rb_vector;
+  VALUE rb_point;
 
-  for(count = 0; count < 3; count++) {
-  	//Should be nmatrix?
-    ray_direction_vector[count] = NUM2DBL(RARRAY_PTR(dvec)[count]);
-  }
-  
-  sincpt_c(StringValuePtr(method), StringValuePtr(target), NUM2DBL(et), StringValuePtr(fixref), StringValuePtr(abcorr), StringValuePtr(obsrvr), StringValuePtr(dref), ray_direction_vector, surface_point, &intercept_epoch, surface_vector, &found);
+  sincpt_c(StringValuePtr(method), StringValuePtr(target), NUM2DBL(et), StringValuePtr(fixref), StringValuePtr(abcorr), StringValuePtr(obsrvr), StringValuePtr(dref), NM_STORAGE_DENSE(dvec)->elements, surface_point, &intercept_epoch, surface_vector, &found);
 
   if(!found) {
   	return Qfalse;
@@ -224,11 +215,10 @@ static VALUE sincpt(VALUE self, VALUE method, VALUE target, VALUE et, VALUE fixr
   else if(spice_error(SPICE_ERROR_SHORT)) {
   	return Qnil;
   }
+  
+  rb_point = rb_nmatrix_dense_create(FLOAT64, (size_t *) VECTOR_SHAPE, 2, (void *) surface_point, 3);
+  rb_vector = rb_nmatrix_dense_create(FLOAT64, (size_t *) VECTOR_SHAPE, 2, (void *) surface_vector, 3);
 
-  for (count = 0; count < 3; count++) {
-    rb_ary_push(rb_vector, DBL2NUM(surface_vector[count]));
-    rb_ary_push(rb_point, DBL2NUM(surface_point[count]));
-  }  
 
   return rb_ary_new3(3, rb_point, rb_vector, DBL2NUM(intercept_epoch));
 }
@@ -248,27 +238,22 @@ static VALUE sincpt(VALUE self, VALUE method, VALUE target, VALUE et, VALUE fixr
 */
 
 static VALUE subpnt(VALUE self, VALUE method, VALUE target, VALUE et, VALUE fixref, VALUE abcorr, VALUE obsrvr) {
-  //loop control
-  int count;
-
   //Output
   double observer_epoch,
          surface_point[3],
          surface_vector[3];
 
   //Arrays that we return to Ruby
-  VALUE rb_vector = rb_ary_new();
-  VALUE rb_point  = rb_ary_new();
+  VALUE rb_vector;
+  VALUE rb_point;
 
   subpnt_c(StringValuePtr(method), StringValuePtr(target), NUM2DBL(et), StringValuePtr(fixref), StringValuePtr(abcorr), StringValuePtr(obsrvr), surface_point, &observer_epoch, surface_vector);
 
   if(spice_error(SPICE_ERROR_SHORT)) return Qnil;
-
-  for (count = 0; count < 3; count++) {
-    rb_ary_push(rb_vector, DBL2NUM(surface_vector[count]));
-    rb_ary_push(rb_point, DBL2NUM(surface_point[count]));
-  }  
-
+  
+  rb_vector = rb_nmatrix_dense_create(FLOAT64, (size_t *) VECTOR_SHAPE, 2, (void *) surface_point, 3);
+  rb_point = rb_nmatrix_dense_create(FLOAT64, (size_t *) VECTOR_SHAPE, 2, (void *) surface_vector, 3);
+  
   return rb_ary_new3(3, rb_point, rb_vector, DBL2NUM(observer_epoch));
 }
 
@@ -287,9 +272,6 @@ static VALUE subpnt(VALUE self, VALUE method, VALUE target, VALUE et, VALUE fixr
 */
 
 static VALUE subslr(VALUE self, VALUE method, VALUE target, VALUE et, VALUE fixref, VALUE abcorr, VALUE obsrvr) {
-  //loop control
-  int count;
-
   //Output
   double sub_solar_epoch,
          surface_point[3],
@@ -303,10 +285,8 @@ static VALUE subslr(VALUE self, VALUE method, VALUE target, VALUE et, VALUE fixr
 
   if(spice_error(SPICE_ERROR_SHORT)) return Qnil;
 
-  for (count = 0; count < 3; count++) {
-    rb_ary_push(rb_vector, DBL2NUM(surface_vector[count]));
-    rb_ary_push(rb_point, DBL2NUM(surface_point[count]));
-  }  
+  rb_point = rb_nmatrix_dense_create(FLOAT64, (size_t *) VECTOR_SHAPE, 2, (void *) surface_point, 3);
+  rb_vector = rb_nmatrix_dense_create(FLOAT64, (size_t *) VECTOR_SHAPE, 2, (void *) surface_vector, 3);
 
   return rb_ary_new3(3, rb_point, rb_vector, DBL2NUM(sub_solar_epoch));
 }
@@ -338,22 +318,20 @@ static VALUE getfov(VALUE self, VALUE instid, VALUE room, VALUE shapelen, VALUE 
   VALUE rb_sight_vector = rb_ary_new();
 
   getfov_c(FIX2INT(instid), FIX2INT(room), FIX2INT(shapelen), FIX2INT(framelen), shape, frame, boundary_sight, &vector_count, boundary_vectors);
-
-  for (count = 0; count < 3; count++) {
-    rb_ary_push(rb_sight_vector, DBL2NUM(boundary_sight[count]));
-  }
-
-  rb_bounds = rb_ary_new2(vector_count);
-
-  for (count = 0; count < vector_count; count++) {
-    rb_ary_push(rb_bounds, rb_ary_new3(3, DBL2NUM(boundary_vectors[count][0]), DBL2NUM(boundary_vectors[count][1]), DBL2NUM(boundary_vectors[count][2])));
-  }
   
   if(spice_error(SPICE_ERROR_SHORT)) {
     return Qnil;
   }
+  
+  rb_sight_vector = rb_nmatrix_dense_create(FLOAT64, (size_t *) VECTOR_SHAPE, 2, (void *) boundary_sight, 3); 
 
-  return rb_ary_new3(4, RB_STR2SYM(shape), RB_STR2SYM(frame), rb_sight_vector, rb_bounds, vector_count);
+  rb_bounds = rb_ary_new2(vector_count);
+
+  for (count = 0; count < vector_count; count++) {
+    rb_ary_push(rb_bounds, rb_nmatrix_dense_create(FLOAT64, (size_t *) VECTOR_SHAPE, 2, (void *) boundary_vectors[count], 3));
+  }
+  
+  return rb_ary_new3(5, RB_STR2SYM(shape), RB_STR2SYM(frame), rb_sight_vector, rb_bounds, vector_count);
 }
 
 static VALUE recsph(VALUE self, VALUE rectangular) {
@@ -366,10 +344,12 @@ static VALUE recsph(VALUE self, VALUE rectangular) {
   return rb_ary_new3(3, DBL2NUM(radius), DBL2NUM(colatitude), DBL2NUM(longitude));
 }
 
-static VALUE sphrec(VALUE self, VALUE radius, VALUE colatitude, VALUE longitude, VALUE rectangular) {
-  sphrec_c(NUM2DBL(radius), NUM2DBL(colatitude), NUM2DBL(longitude), NM_STORAGE_DENSE(rectangular)->elements);
+static VALUE sphrec(VALUE self, VALUE radius, VALUE colatitude, VALUE longitude) {
+  double vector[3];
+
+  sphrec_c(NUM2DBL(radius), NUM2DBL(colatitude), NUM2DBL(longitude), vector);
   
-  return rectangular;
+  return rb_nmatrix_dense_create(FLOAT64, (size_t *) VECTOR_SHAPE, 2, (void *) vector, 3);
 }
 
 /*
@@ -400,10 +380,12 @@ static VALUE recrad(VALUE self, VALUE rectangular) {
   return rb_ary_new3(3, DBL2NUM(range), DBL2NUM(right_ascension), DBL2NUM(declination));
 }
 
-static VALUE radrec(VALUE self, VALUE range, VALUE right_ascension, VALUE declination, VALUE rectangular) {
-  radrec_c(NUM2DBL(range), NUM2DBL(right_ascension), NUM2DBL(declination), NM_STORAGE_DENSE(rectangular)->elements);
+static VALUE radrec(VALUE self, VALUE range, VALUE right_ascension, VALUE declination) {
+  double vector[3];
 
-  return rectangular;
+  radrec_c(NUM2DBL(range), NUM2DBL(right_ascension), NUM2DBL(declination), vector);
+  
+  return rb_nmatrix_dense_create(FLOAT64, (size_t *) VECTOR_SHAPE, 2, (void *) vector, 3);
 }
 
 static VALUE recgeo(VALUE self, VALUE rectangular, VALUE radius_equatorial, VALUE flattening) {
@@ -418,12 +400,14 @@ static VALUE recgeo(VALUE self, VALUE rectangular, VALUE radius_equatorial, VALU
   return rb_ary_new3(3, DBL2NUM(longitude), DBL2NUM(latitude), DBL2NUM(altitude));
 }
 
-static VALUE georec(VALUE self, VALUE longitude, VALUE latitude, VALUE altitude, VALUE radius_equatorial, VALUE flattening, VALUE rectangular) {
-  georec_c(NUM2DBL(longitude), NUM2DBL(latitude), NUM2DBL(altitude), NUM2DBL(radius_equatorial), NUM2DBL(flattening), NM_STORAGE_DENSE(rectangular)->elements);
+static VALUE georec(VALUE self, VALUE longitude, VALUE latitude, VALUE altitude, VALUE radius_equatorial, VALUE flattening) {
+  double vector[3];
+
+  georec_c(NUM2DBL(longitude), NUM2DBL(latitude), NUM2DBL(altitude), NUM2DBL(radius_equatorial), NUM2DBL(flattening), vector);
   
   if(spice_error(SPICE_ERROR_SHORT)) return Qnil;
 
-  return rectangular;
+  return rb_nmatrix_dense_create(FLOAT64, (size_t *) VECTOR_SHAPE, 2, (void *) vector, 3);
 }
 
 static VALUE recpgr(VALUE self, VALUE body, VALUE rectangular, VALUE radius_equatorial, VALUE flattening) {
@@ -438,12 +422,14 @@ static VALUE recpgr(VALUE self, VALUE body, VALUE rectangular, VALUE radius_equa
   return rb_ary_new3(3, DBL2NUM(longitude), DBL2NUM(latitude), DBL2NUM(altitude));
 }
 
-static VALUE pgrrec(VALUE self, VALUE body, VALUE longitude, VALUE latitude, VALUE altitude, VALUE radius_equatorial, VALUE flattening, VALUE rectangular) {
-  pgrrec_c(RB_SYM2STR(body), NUM2DBL(radius_equatorial), NUM2DBL(flattening), NUM2DBL(longitude), NUM2DBL(latitude), NUM2DBL(altitude), NM_STORAGE_DENSE(rectangular)->elements);
+static VALUE pgrrec(VALUE self, VALUE body, VALUE longitude, VALUE latitude, VALUE altitude, VALUE radius_equatorial, VALUE flattening) {
+  double vector[3];
+
+  pgrrec_c(RB_SYM2STR(body), NUM2DBL(radius_equatorial), NUM2DBL(flattening), NUM2DBL(longitude), NUM2DBL(latitude), NUM2DBL(altitude), vector);
 
   if(spice_error(SPICE_ERROR_SHORT)) return Qnil;
 
-  return rectangular;
+  return rb_nmatrix_dense_create(FLOAT64, (size_t *) VECTOR_SHAPE, 2, (void *) vector, 3);
 }
 
 
@@ -475,7 +461,7 @@ void Init_spice_rub(){
   rb_define_module_function(spicerub_nested_module, "kclear", kclear, 0);
 
   //Attach Geometry-Coordinate functions to module
-  rb_define_module_function(spicerub_nested_module, "latrec", latrec, 4);
+  rb_define_module_function(spicerub_nested_module, "latrec", latrec, 3);
   rb_define_module_function(spicerub_nested_module, "reclat", reclat, 1);
   rb_define_module_function(spicerub_nested_module, "lspcn", lspcn, -1);
   rb_define_module_function(spicerub_nested_module, "sincpt", sincpt, 8);
@@ -483,14 +469,14 @@ void Init_spice_rub(){
   rb_define_module_function(spicerub_nested_module, "subslr", subslr, 6);
   rb_define_module_function(spicerub_nested_module, "getfov", getfov, 4);
   rb_define_module_function(spicerub_nested_module, "recsph", recsph, 1);
-  rb_define_module_function(spicerub_nested_module, "sphrec", sphrec, 4);
+  rb_define_module_function(spicerub_nested_module, "sphrec", sphrec, 3);
   rb_define_module_function(spicerub_nested_module, "phaseq", phaseq, 5);
   rb_define_module_function(spicerub_nested_module, "recrad", recrad, 1);
-  rb_define_module_function(spicerub_nested_module, "radrec", radrec, 4);
+  rb_define_module_function(spicerub_nested_module, "radrec", radrec, 3);
   rb_define_module_function(spicerub_nested_module, "recgeo", recgeo, 3);
-  rb_define_module_function(spicerub_nested_module, "georec", georec, 6);
+  rb_define_module_function(spicerub_nested_module, "georec", georec, 5);
   rb_define_module_function(spicerub_nested_module, "recpgr", recpgr, 4);
-  rb_define_module_function(spicerub_nested_module, "pgrrec", pgrrec, 7);
+  rb_define_module_function(spicerub_nested_module, "pgrrec", pgrrec, 6);
 
   //Atttach Time and Time Conversion functions
   rb_define_module_function(spicerub_nested_module, "str2et", str2et, 1);

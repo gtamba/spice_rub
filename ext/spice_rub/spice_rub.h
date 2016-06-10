@@ -29,6 +29,8 @@ static VALUE recgeo(VALUE self, VALUE rectangular, VALUE radius_equatorial, VALU
 static VALUE georec(VALUE self, VALUE longitude, VALUE latitude, VALUE altitude, VALUE radius_equatorial, VALUE flattening);
 static VALUE recpgr(VALUE self, VALUE body, VALUE rectangular, VALUE radius_equatorial, VALUE flattening);
 static VALUE pgrrec(VALUE self, VALUE body, VALUE longitude, VALUE latitude, VALUE altitude, VALUE radius_equatorial, VALUE flattening);
+static VALUE dpr(VALUE self);
+static VALUE rpd(VALUE self);
 
 //Time and Time Conversions Functions
 static VALUE str2et(VALUE self, VALUE epoch);

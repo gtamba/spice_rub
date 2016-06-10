@@ -432,6 +432,13 @@ static VALUE pgrrec(VALUE self, VALUE body, VALUE longitude, VALUE latitude, VAL
   return rb_nmatrix_dense_create(FLOAT64, (size_t *) VECTOR_SHAPE, 2, (void *) vector, 3);
 }
 
+static VALUE dpr(VALUE self) {
+  return DBL2NUM(dpr_c());
+}
+
+static VALUE rpd(VALUE self) {
+  return DBL2NUM(rpd_c());
+}
 
 //End of Geometry and Co-Ordinate Functions
 
@@ -477,6 +484,9 @@ void Init_spice_rub(){
   rb_define_module_function(spicerub_nested_module, "georec", georec, 5);
   rb_define_module_function(spicerub_nested_module, "recpgr", recpgr, 4);
   rb_define_module_function(spicerub_nested_module, "pgrrec", pgrrec, 6);
+  rb_define_module_function(spicerub_nested_module, "dpr", dpr, 0);
+  rb_define_module_function(spicerub_nested_module, "rpd", rpd, 0);
+
 
   //Atttach Time and Time Conversion functions
   rb_define_module_function(spicerub_nested_module, "str2et", str2et, 1);

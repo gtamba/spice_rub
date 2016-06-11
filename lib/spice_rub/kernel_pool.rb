@@ -20,8 +20,13 @@ module SpiceRub
   # furnsh_c , unload_c, ktotal_c, kclear_c
   class KernelPool
     include Singleton
-
+    
+    # List of SpiceKernel objects that represent kernel files that 
+    # have been loaded previously.
     attr_reader :pool
+    
+    # Path variable which can be set for convenience if all requires kernels
+    # are in the same file directory, nil by default.
     attr_accessor :path
 
     #
@@ -73,7 +78,7 @@ module SpiceRub
     #     load -> FixNum
     #
     # Returns a FixNum corresponding to the index of the kernel 
-    # in the kernel pool if the load is successful. Ruby interface to furnsh_c from
+    # in the kernel pool if the load is successful. Ruby interface to furnsh_c() from
     # the SPICE toolkit.
     #
     # * *Arguments* :
@@ -97,10 +102,10 @@ module SpiceRub
 
     #
     # call-seq:
-    #     clear -> TrueClass/FalseClass
+    #     clear! -> TrueClass/FalseClass
     # 
     # Clears the kernel pool and returns true if successful.
-    # Ruby interface to kclear_c from the SPICE Toolkit.
+    # Ruby interface to kclear_c() from the SPICE Toolkit.
     #        
     # Examples :-
     #   kernel_pool.clear!
@@ -124,7 +129,7 @@ module SpiceRub
     #     count -> FixNum
     # 
     # Returns the number of loaded kernels in the kernel pool
-    # Ruby interface for ktotal_c from the SPICE Toolkit.        
+    # Ruby interface for ktotal_c() from the SPICE Toolkit.        
     #
     # Examples :-
     #   kernel_pool.pool
@@ -139,6 +144,19 @@ module SpiceRub
       SpiceRub::Native.ktotal(category)
     end
 
+    #
+    # call-seq:
+    #     empty? -> TrueClass/FalseClass
+    # 
+    # Returns true if the number of loaded kernels is 0       
+    #
+    # Examples :-
+    #   kernel_pool.clear!
+    #     => true
+    #
+    #   kernel_pool.empty?
+    #     => true
+    #
     def empty?
       count.zero?
     end
@@ -165,9 +183,28 @@ module SpiceRub
 
       def initialize(path)
         @path_to = path
-        @loaded = true
+        @loaded  = true
       end
 
+      #
+      # call-seq:
+      #     unload -> TrueClass/FalseClass
+      # 
+      # Unloads the kernel from the kernel pool. Ruby         
+      # interface to unload_c()
+      #
+      # Examples :-
+      #   kernel_pool.pool
+      #     => [#<SpiceRub::KernelPool::SpiceKernel:0x0000000142ed60 @loaded=true, @path_to="spec/data/kernels/naif0011.tls">,
+      #         #<SpiceRub::KernelPool::SpiceKernel:0x00000000aee980 @loaded=true, @path_to="spec/data/kernels/moon_pa_de421_1900-2050.bpc">,
+      #         #<SpiceRub::KernelPool::SpiceKernel:0x00000000a42ef0 @loaded=true, @path_to="spec/data/kernels/de405_1960_2020.bsp">]
+      #
+      #   kernel_pool[0].unload
+      #     => true
+      #   
+      #   kernel_pool.count
+      #     => 2
+      #   
       def unload
         if SpiceRub::Native.unload(@path_to)
           @loaded = false

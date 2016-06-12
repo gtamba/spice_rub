@@ -82,7 +82,7 @@ module SpiceRub
     # the SPICE toolkit.
     #
     # * *Arguments* :
-    #   - +file+ -> The relative file path of the kernel if path is nil, else the filename 
+    #   - +file+ -> The relative file path of the kernel if path is nil, else the filename
     #               
     # Examples :-
     #   kernel_pool = KernelPool.instance
@@ -140,7 +140,7 @@ module SpiceRub
     #   kernel_pool.count
     #     => 3
     #
-    def count(category = :ALL)
+    def count(category = :all)
       SpiceRub::Native.ktotal(category)
     end
 
@@ -188,7 +188,7 @@ module SpiceRub
 
       #
       # call-seq:
-      #     unload -> TrueClass/FalseClass
+      #     unload! -> TrueClass/FalseClass
       # 
       # Unloads the kernel from the kernel pool. Ruby         
       # interface to unload_c()
@@ -199,13 +199,13 @@ module SpiceRub
       #         #<SpiceRub::KernelPool::SpiceKernel:0x00000000aee980 @loaded=true, @path_to="spec/data/kernels/moon_pa_de421_1900-2050.bpc">,
       #         #<SpiceRub::KernelPool::SpiceKernel:0x00000000a42ef0 @loaded=true, @path_to="spec/data/kernels/de405_1960_2020.bsp">]
       #
-      #   kernel_pool[0].unload
+      #   kernel_pool[0].unload!
       #     => true
       #   
       #   kernel_pool.count
       #     => 2
       #   
-      def unload
+      def unload!
         if SpiceRub::Native.unload(@path_to)
           @loaded = false
           true
@@ -218,6 +218,6 @@ module SpiceRub
         @loaded
       end
     end
-    private_constant :SpiceKernel
+    #private_constant :SpiceKernel
   end
 end

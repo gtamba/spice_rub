@@ -1,0 +1,61 @@
+      KPL/IK
+      
+      The keywords below define a circular, 10-degree wide FOV with
+      the boresight along the +Z axis of the 'SC999_INST001' frame
+      for an instrument with ID -999001 using the "angles"-class
+      specification.
+      
+      \begindata
+         INS-999001_FOV_CLASS_SPEC       = 'ANGLES'
+         INS-999001_FOV_SHAPE            = 'CIRCLE'
+         INS-999001_FOV_FRAME            = 'SC999_INST001'
+         INS-999001_BORESIGHT            = ( 0.0, 0.0, 1.0 )
+         INS-999001_FOV_REF_VECTOR       = ( 1.0, 0.0, 0.0 )
+         INS-999001_FOV_REF_ANGLE        = ( 5.0 )
+         INS-999001_FOV_ANGLE_UNITS      = ( 'DEGREES' )
+      \begintext
+      
+      The keywords below define an elliptical FOV with 2- and
+      4-degree angular extents in the XZ and XY planes and the
+      boresight along the +X axis of the 'SC999_INST002' frame for
+      an instrument with ID -999002 using the "corners"-class
+      specification.
+      
+      \begindata
+         INS-999002_FOV_SHAPE            = 'ELLIPSE'
+         INS-999002_FOV_FRAME            = 'SC999_INST002'
+         INS-999002_BORESIGHT            = ( 1.0, 0.0, 0.0 )
+         INS-999002_FOV_BOUNDARY_CORNERS = ( 1.0, 0.0, 0.01745506,
+                                             1.0, 0.03492077, 0.0 )
+      \begintext
+      
+      The keywords below define a rectangular FOV with 1.2- and
+      0.2-degree angular extents in the ZX and ZY planes and the
+      boresight along the +Z axis of the 'SC999_INST003' frame for
+      an instrument with ID -999003 using the "angles"-class
+      specification.
+      
+      \begindata
+         INS-999003_FOV_CLASS_SPEC       = 'ANGLES'
+         INS-999003_FOV_SHAPE            = 'RECTANGLE'
+         INS-999003_FOV_FRAME            = 'SC999_INST003'
+         INS-999003_BORESIGHT            = ( 0.0, 0.0, 1.0 )
+         INS-999003_FOV_REF_VECTOR       = ( 1.0, 0.0, 0.0 )
+         INS-999003_FOV_REF_ANGLE        = ( 0.6 )
+         INS-999003_FOV_CROSS_ANGLE      = ( 0.1 )
+         INS-999003_FOV_ANGLE_UNITS      = ( 'DEGREES' )
+      \begintext
+      
+      The keywords below define a triangular FOV with the boresight
+      along the +Y axis of the 'SC999_INST004' frame for an
+      instrument with ID -999004 using the "corners"-class
+      specification.
+      
+      \begindata
+         INS-999004_FOV_SHAPE            = 'POLYGON'
+         INS-999004_FOV_FRAME            = 'SC999_INST004'
+         INS-999004_BORESIGHT            = (  0.0,  1.0,  0.0 )
+         INS-999004_FOV_BOUNDARY_CORNERS = (  0.0,  0.8,  0.5,
+                                              0.4,  0.8, -0.2,
+                                             -0.4,  0.8, -0.2 )
+      \begintext

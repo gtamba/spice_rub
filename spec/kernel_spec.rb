@@ -33,7 +33,9 @@ describe SpiceRub::KernelPool do
       #be_a_instance_of fails for some reason
       it { is_expected.to be_a (SpiceRub::KernelPool::SpiceKernel) }
       it { is_expected.to be_loaded }
-      its(:path) {is_expected.to eq kernel_pool.path.dup << file}
+      
+      #its is deprecated 
+      its(:path_to) {is_expected.to eq File.join(kernel_pool.path, file)}
     end
   end
   

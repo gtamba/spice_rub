@@ -31,6 +31,8 @@ static VALUE recpgr(VALUE self, VALUE body, VALUE rectangular, VALUE radius_equa
 static VALUE pgrrec(VALUE self, VALUE body, VALUE longitude, VALUE latitude, VALUE altitude, VALUE radius_equatorial, VALUE flattening);
 static VALUE dpr(VALUE self);
 static VALUE rpd(VALUE self);
+static VALUE getfov(VALUE self, VALUE instid, VALUE room, VALUE shapelen, VALUE framelen);
+static VALUE bodvrd(VALUE self, VALUE bodynm, VALUE item, VALUE maxn);
 
 //Time and Time Conversions Functions
 static VALUE str2et(VALUE self, VALUE epoch);

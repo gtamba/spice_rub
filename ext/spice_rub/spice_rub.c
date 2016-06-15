@@ -154,7 +154,7 @@ static VALUE reclat(VALUE self, VALUE rectangular_point) {
 static VALUE lspcn(int argc, VALUE *argv, VALUE self) {
   double result;
 
-  result = lspcn_c(StringValuePtr(argv[0]), NUM2DBL(argv[1]), StringValuePtr(argv[2]));
+  result = lspcn_c(RB_SYM2STR(argv[0]), NUM2DBL(argv[1]), RB_SYM2STR(argv[2]));
 
   if(spice_error(SPICE_ERROR_SHORT)) return Qnil;
 
@@ -247,7 +247,7 @@ static VALUE subpnt(VALUE self, VALUE method, VALUE target, VALUE et, VALUE fixr
   VALUE rb_vector;
   VALUE rb_point;
 
-  subpnt_c(StringValuePtr(method), StringValuePtr(target), NUM2DBL(et), StringValuePtr(fixref), StringValuePtr(abcorr), StringValuePtr(obsrvr), surface_point, &observer_epoch, surface_vector);
+  subpnt_c(StringValuePtr(method), RB_SYM2STR(target), NUM2DBL(et), RB_SYM2STR(fixref), RB_SYM2STR(abcorr), RB_SYM2STR(obsrvr), surface_point, &observer_epoch, surface_vector);
 
   if(spice_error(SPICE_ERROR_SHORT)) return Qnil;
   
@@ -281,7 +281,7 @@ static VALUE subslr(VALUE self, VALUE method, VALUE target, VALUE et, VALUE fixr
   VALUE rb_vector = rb_ary_new();
   VALUE rb_point  = rb_ary_new();
 
-  subslr_c(StringValuePtr(method), StringValuePtr(target), NUM2DBL(et), StringValuePtr(fixref), StringValuePtr(abcorr), StringValuePtr(obsrvr), surface_point, &sub_solar_epoch, surface_vector);
+  subslr_c(StringValuePtr(method), RB_SYM2STR(target), NUM2DBL(et), RB_SYM2STR(fixref), RB_SYM2STR(abcorr), RB_SYM2STR(obsrvr), surface_point, &sub_solar_epoch, surface_vector);
 
   if(spice_error(SPICE_ERROR_SHORT)) return Qnil;
 
@@ -308,7 +308,8 @@ void getfov_c ( SpiceInt        instid,
 static VALUE getfov(VALUE self, VALUE instid, VALUE room, VALUE shapelen, VALUE framelen) {
   int count, vector_count;
   //Maximum size of SPICE ID is 32 chars
-  char shape[32], frame[32];
+  char * shape = ALLOC_N(char, shapelen);
+  char * frame = ALLOC_N(char, framelen);
   
   //Upper bound on boundary vectors is uncertain
   double boundary_sight[3];
@@ -316,6 +317,7 @@ static VALUE getfov(VALUE self, VALUE instid, VALUE room, VALUE shapelen, VALUE 
   
   VALUE rb_bounds; 
   VALUE rb_sight_vector = rb_ary_new();
+  VALUE rb_shape, rb_frame;
 
   getfov_c(FIX2INT(instid), FIX2INT(room), FIX2INT(shapelen), FIX2INT(framelen), shape, frame, boundary_sight, &vector_count, boundary_vectors);
   
@@ -330,8 +332,16 @@ static VALUE getfov(VALUE self, VALUE instid, VALUE room, VALUE shapelen, VALUE 
   for (count = 0; count < vector_count; count++) {
     rb_ary_push(rb_bounds, rb_nmatrix_dense_create(FLOAT64, (size_t *) VECTOR_SHAPE, 2, (void *) boundary_vectors[count], 3));
   }
+
+  rb_shape = RB_STR2SYM(shape);
+  rb_frame = RB_STR2SYM(frame);
+
+  xfree(shape);
+  xfree(frame);
+
+  if(spice_error(SPICE_ERROR_SHORT)) return Qnil; 
   
-  return rb_ary_new3(5, RB_STR2SYM(shape), RB_STR2SYM(frame), rb_sight_vector, rb_bounds, vector_count);
+  return rb_ary_new3(5, rb_shape, rb_frame, rb_sight_vector, rb_bounds, INT2FIX(vector_count));
 }
 
 static VALUE recsph(VALUE self, VALUE rectangular) {
@@ -440,6 +450,22 @@ static VALUE rpd(VALUE self) {
   return DBL2NUM(rpd_c());
 }
 
+static VALUE bodvrd(VALUE self, VALUE bodynm, VALUE item, VALUE maxn) {
+  int dim, count;
+  double * values = ALLOC_N(double, maxn); 
+  VALUE rb_values = rb_ary_new();
+
+  bodvrd_c(RB_SYM2STR(bodynm), RB_SYM2STR(item), FIX2INT(maxn), &dim, values);
+  
+  for(count = 0 ; count < dim ; count++) {
+    rb_ary_push(rb_values, DBL2NUM(values[count]));
+  }
+  
+  xfree(values);
+
+  return rb_ary_new3(2, INT2FIX(dim), rb_values);
+}
+
 //End of Geometry and Co-Ordinate Functions
 
 
@@ -486,6 +512,8 @@ void Init_spice_rub(){
   rb_define_module_function(spicerub_nested_module, "pgrrec", pgrrec, 6);
   rb_define_module_function(spicerub_nested_module, "dpr", dpr, 0);
   rb_define_module_function(spicerub_nested_module, "rpd", rpd, 0);
+  rb_define_module_function(spicerub_nested_module, "bodvrd", bodvrd, 3);
+
 
 
   //Atttach Time and Time Conversion functions

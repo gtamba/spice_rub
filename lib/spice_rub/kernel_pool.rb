@@ -12,7 +12,6 @@
 # furnsh_c , unload_c, ktotal_c, kclear_c
 #++
 
-require 'spice_rub.so'
 require 'singleton'
 
 module SpiceRub
@@ -92,10 +91,10 @@ module SpiceRub
     #   kernel_pool.load("naif0011.tls")
     #     => 0
     #
-    def load(file)
+    def load(file, absolute: nil)
       @pool ||= []
 
-      file = @path.dup << file if check_path
+      file = File.join(@path, file) if @path and not absolute
       @pool << SpiceKernel.new(file) if SpiceRub::Native.furnsh(file)
       @pool.length - 1
     end
@@ -161,20 +160,9 @@ module SpiceRub
       count.zero?
     end
 
-    def check_path
-      if @path && @path.is_a?(String)
-        @path << '/' unless @path[-1] == '/'
-        true
-      else
-        false
-      end
-    end
-
     def clear_path!
       @path = nil
     end
-
-    private :check_path
 
     # SpiceKernel class, a helper object used by KernelPool to track
     # kernel files, is not visible outside KernelPool.

@@ -1,9 +1,5 @@
 require 'spec_helper'
-
-PI_RADIAN = Math::PI
-
-
-                   
+               
 
 # test SpiceRub::Native.furnsh, SpiceRub::Native.ktotal, SpiceRub::Native.kclear SpiceRub::Native.unload
 #
@@ -19,11 +15,11 @@ describe "SpiceRub::Native" do
   describe "functions that inter-convert co-ordinate systems" do
     before(:all) do
       EXAMPLE_COORDINATES = {
-                             :lat =>  [1.0, PI_RADIAN / 2 , 0.0], 
+                             :lat =>  [1.0, PI / 2 , 0.0], 
                              :rec =>  NMatrix.new([1,3], [0.0, 1, 0.0]) , 
-                             :sph =>  [1.0, PI_RADIAN / 2, PI_RADIAN/2],
+                             :sph =>  [1.0, PI / 2, PI / 2],
                              :pgr =>  1, 
-                             :rad =>  [1.0, PI_RADIAN / 2, 0.0]
+                             :rad =>  [1.0, PI / 2, 0.0]
                             }
     end
 

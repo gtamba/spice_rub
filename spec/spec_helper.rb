@@ -2,14 +2,17 @@
 require 'nmatrix'
 require './lib/spice_rub'
 
+#Include can be moved to separate specs if not used frequently eventually
+include Math
+
 TEST_SPK_KERNEL = "de405_1960_2020.bsp"
 TEST_TLS_KERNEL  = "naif0011.tls"
 TEST_PCK_KERNEL = ["moon_pa_de421_1900-2050.bpc", "pck00010.tpc"]
 TEST_INVALID_KERNEL = "invalid_kernel.txt"
 TEST_IK_KERNEL = "instrument.ti"
 
-TEST_KERNELS = { tls: "naif0011.tls", bsp: "de405_1960_2020.bsp", pck: "moon_pa_de421_1900-2050.bpc"}
-TEST_POOL = [TEST_INVALID_KERNEL, TEST_TLS_KERNEL, TEST_SPK_KERNEL, TEST_PCK_KERNEL]
+TEST_KERNELS = { tls: TEST_TLS_KERNEL, bsp: TEST_SPK_KERNEL, pck: TEST_PCK_KERNEL[0]}
+TEST_POOL = [TEST_INVALID_KERNEL, TEST_TLS_KERNEL, TEST_SPK_KERNEL, TEST_PCK_KERNEL[0] ]
 
 
 TEST_INSTRUMENTS = [-999001, -999002]
@@ -22,6 +25,10 @@ module OverrideSPec
   RSpec.configure { |c| c.extend self }
 end
 
+## Custom RSpec matcher ary_be_within() contributed by Victor Shepelev, @zverok
+## 
+##   Matches two arrays within a roundoff error between their floating point values   
+##
 RSpec::Matchers.define :ary_be_within do |delta|
   match do |actual|
     unless @expected

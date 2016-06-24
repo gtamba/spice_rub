@@ -4,9 +4,6 @@ VALUE spicerub_top_module;
 VALUE spicerub_nested_module;
 VALUE rb_spice_error;
 
-const size_t VECTOR_SHAPE[2] = {1,3};
-const size_t STATE_SHAPE[2] = {1,6};
-
 //Kernel Loading Functions
 static VALUE furnsh(VALUE self, VALUE kernel);
 static VALUE unload(VALUE self, VALUE kernel);
@@ -36,17 +33,12 @@ static VALUE bodvrd(VALUE self, VALUE bodynm, VALUE item, VALUE maxn);
 
 //Time and Time Conversions Functions
 static VALUE str2et(VALUE self, VALUE epoch);
+static VALUE gfdist(VALUE self, VALUE target, VALUE abcorr, VALUE obsrvr, VALUE relate, VALUE refval, VALUE adjust, VALUE step, VALUE nintvls, VALUE confines);
+static VALUE gfsntc(VALUE self, VALUE target, VALUE fixref, VALUE method, VALUE abcorr, VALUE obsrvr, VALUE dref, VALUE dvec, VALUE crdsys, VALUE coord, VALUE relate, VALUE refval, VALUE adjust, VALUE step, VALUE nintvls, VALUE confines);
+static VALUE gfsep(VALUE self, VALUE target1, VALUE shape1, VALUE frame1, VALUE target2, VALUE shape2, VALUE frame2, VALUE abcorr, VALUE obsrvr, VALUE relate, VALUE refval, VALUE adjust, VALUE step, VALUE nintvls, VALUE confines);
+static VALUE gftfov(VALUE self, VALUE inst, VALUE target, VALUE tshape, VALUE tframe, VALUE abcorr, VALUE obsrvr, VALUE step, VALUE confines);
+static VALUE gfrfov(VALUE self, VALUE inst, VALUE raydir, VALUE rframe, VALUE abcorr, VALUE obsrvr, VALUE step, VALUE confines);
 
+static VALUE spd(VALUE self);
 
 //Helper Macros
-
-//Macros for switch parameters in error message reports
-#define SPICE_ERROR_SHORT 0
-#define SPICE_ERROR_LONG 1
-#define SPICE_ERROR_EXPLAIN 2
-#define SPICE_ERROR_ALL 3
-
-//Macros for simplifying frequent operations
-// Converts a Ruby Symbol to C string
-#define RB_SYM2STR(val) (rb_id2name(SYM2ID(val)))
-#define RB_STR2SYM(val) (ID2SYM(rb_intern(val)))

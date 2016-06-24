@@ -306,6 +306,206 @@ describe "SpiceRub::Native" do
       skip("pending")  
     end   
   end
+  
+  describe "Functions that return time interval windows for certain target observer constraints" do
+    before(:all) do
+        kernel_pool = SpiceRub::KernelPool.instance
+        kernel_pool.clear! unless kernel_pool.empty?
+        
+        kernel_pool.load(TEST_TLS_KERNEL)
+        kernel_pool.load(TEST_FRAME_KERNEL)
+        kernel_pool.load(TEST_PCK_KERNEL[1])
+        kernel_pool.load(TEST_SPK_KERNEL) 
+    end    
+    
+    describe ".gfdist" do
+      context "when no aberration correction is specified" do
+        let(:expected) {[
+                         [220881665.1839181, 221487067.6618968],
+                         [221942267.9377619, 223844555.32055432],
+                         [224371861.82920635, 226153225.2280659],
+                         [226807478.4829023, 228480838.18623024]
+                        ]}
+      
+        subject { SpiceRub::Native.gfdist(:MOON, 
+                                          :NONE, 
+                                          :EARTH, 
+                                          :<, 
+                                          400000, 
+                                          0, 
+                                          SpiceRub::Native.spd, 
+                                          100, 
+                                          [SpiceRub::Native.str2et("2007 JAN 1"), 
+                                           SpiceRub::Native.str2et("2007 APR 1")]
+                                         )
+                } 
+
+        it { is_expected.to ary_be_within(0.0000001).of(expected) }
+      end
+    end
+    
+    describe ".gfsntc" do
+      context "when no aberration correction is specified" do
+        
+        let(:expected) {[
+                         [227707285.52730322, 227707285.52730322],
+                         [243812799.60698172, 243812799.60698172]
+                        ]}
+      
+        subject { SpiceRub::Native.gfsntc(:EARTH, 
+                                          :IAU_EARTH, 
+                                          :Ellipsoid, 
+                                          :NONE, 
+                                          :SUN, 
+                                          :SEM, 
+                                          NMatrix.new([1,3], [1.0,0,0]), 
+                                          :LATITUDINAL, 
+                                          :LATITUDE, 
+                                          :"=", 
+                                          0, 
+                                          0, 
+                                          90 *SpiceRub::Native.spd, 100, 
+                                          [SpiceRub::Native.str2et("2007 JAN 1"), 
+                                           SpiceRub::Native.str2et("2008 JAN 1")])
+                } 
+
+        it { is_expected.to ary_be_within(0.0000001).of(expected) }
+      end
+    end
+
+    describe ".gfsep" do
+      context "when no aberration correction is specified" do
+        
+        let(:expected) {[
+                         [221786480.22448748, 221786480.22448748],
+                         [223047821.03743732, 223047821.03743732],
+                         [224354993.44196665, 224354993.44196665],
+                         [225595098.96333015, 225595098.96333015]
+                        ]}
+      
+        subject { SpiceRub::Native.gfsep(:MOON,
+                                         :SPHERE, 
+                                         :NULL, 
+                                         :EARTH, 
+                                         :SPHERE, 
+                                         :NULL, 
+                                         :NONE, 
+                                         :SUN, 
+                                         :LOCMAX, 
+                                         0, 
+                                         0, 
+                                         6  * SpiceRub::Native.spd, 
+                                         40, 
+                                         [SpiceRub::Native.str2et("2007 JAN 1"), 
+                                          SpiceRub::Native.str2et("2008 APR 1")])[0,4]
+                } 
+
+        it { is_expected.to ary_be_within(0.0000001).of(expected) }
+      end
+    end
+
+    describe ".gfoclt" do
+      context "when no aberration correction is specified" do
+        
+        let(:expected) {[
+                         [61632614.20334693, 61637750.32880422]
+                        ]}
+      
+        subject { SpiceRub::Native.gfoclt(:any, 
+                                          :MOON, 
+                                          :Ellipsoid, 
+                                          :IAU_MOON, 
+                                          :Sun, 
+                                          :Ellipsoid, 
+                                          :iau_sun, 
+                                          :lt, 
+                                          :earth, 
+                                          180.0, 
+                                          [SpiceRub::Native.str2et("2001 DEC 01 00:00:00 TDB"), 
+                                           SpiceRub::Native.str2et("2002 JAN 01 00:00:00 TDB")])
+                }
+
+        it { is_expected.to ary_be_within(0.0000001).of(expected) }
+      end
+    end
+
+    describe ".gftfov" do
+      skip("Examples require additional kernels")
+    end    
+    
+    describe ".gfrfov" do
+      skip("Examples require additional kernels")
+    end 
+  
+    describe "functions that convert time or time strings into different encodings" do
+      before(:all) do
+        kernel_pool = SpiceRub::KernelPool.instance
+        kernel_pool.clear! unless kernel_pool.empty?
+        kernel_pool.load(TEST_TLS_KERNEL)
+        kernel_pool.load(TEST_SCLK_KERNEL)
+      end
+
+      describe ".timout" do
+        context "When picture is YYYY Mon DD, HR:MN:SC ::UTC" do
+          subject { SpiceRub::Native.timout(435443.342, "YYYY Mon DD, HR:MN:SC ::UTC", 40) }
+
+          it { is_expected.to eq "2000 Jan 06, 12:56:19" }
+        end
+        
+        context "When picture is MON DD,YYYY  HR:MN:SC.#### (TDB) ::TDB" do
+          subject { SpiceRub::Native.timout(435443.342, "MON DD,YYYY  HR:MN:SC.#### (TDB) ::TDB", 40)}
+
+          it { is_expected.to eq "JAN 06,2000  12:57:23.3420 (TDB)" }
+        end
+      end
+
+      describe ".str2et" do
+        subject { SpiceRub::Native.str2et("Nov 10 2000") }
+
+        it { is_expected.to be_within(0.00000001).of 27086464.182655092 }
+      end
+      
+      describe ".sce2c" do
+        subject { SpiceRub::Native.sce2c(-77, 10000) }
+
+        it { is_expected.to be_within(0.00000001).of 38768325676.97447 }
+      end
+     
+      describe ".sctiks" do
+        subject { SpiceRub::Native.sctiks(-77, "      0:01:000") }
+
+        it { is_expected.to eq 80.0 }
+      end
+      
+      describe ".scencd" do
+        subject { SpiceRub::Native.scencd(-77, "0:01:001") }
+
+        it { is_expected.to eq 88.0 }
+      end
+      
+      describe ".scs2e" do
+        subject { SpiceRub::Native.scs2e(-77, "11389.29.768") }
+        
+        it { is_expected.to be_within(0.00000001).of -322368174.21305406 }
+      end
+      
+      describe ".scdecd" do
+        subject { SpiceRub::Native.scdecd(-77, 11389, 40) }
+        
+        it { is_expected.to eq "1/00000001:51:3:5" }
+      end    
+
+      describe ".sct2e" do
+        let(:sclkdp) { SpiceRub::Native.scencd(-77, "1/ 1900000:00:00") }
+
+        subject { SpiceRub::Native.sct2e(-77, sclkdp) }
+        
+        it { is_expected.to eq -207792586.16380078 }
+      end
+
+
+    end
+  end
 end
   
 

@@ -1,8 +1,5 @@
 #include "spice_ephemerides.h"
 
-extern size_t VECTOR_SHAPE[2];
-extern size_t STATE_SHAPE[2];
-
 VALUE sr_spkpos(VALUE self, VALUE targ, VALUE et, VALUE ref, VALUE abcorr, VALUE obs) {
   double position[3], light_time;
   VALUE rb_position;

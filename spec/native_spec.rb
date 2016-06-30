@@ -522,8 +522,63 @@ describe "SpiceRub::Native" do
         
         it { is_expected.to eq -207792586.16380078 }
       end
+    end
+  end  
+  
+  describe "Functions that perform ephemerides based calculations using kernel data" do
+    before(:all) do
+      kernel_pool = SpiceRub::KernelPool.instance
+      kernel_pool.clear! unless kernel_pool.empty?
+      kernel_pool.load(TEST_PCK_KERNEL[1])
+      kernel_pool.load(TEST_TLS_KERNEL)
+      kernel_pool.load(TEST_SPK_KERNEL)
+    end
 
+    describe ".spkpos" do
+      let(:expected) { [ NMatrix.new([3,1], [-97579460.22494915, -111325884.19041583, -53609500.96053864]) , 525.182681546206 ] }
+      
+      subject { SpiceRub::Native.spkpos(:MOON, SpiceRub::Native.str2et("2006 JAN 31 01:00"), :J2000, :NONE, :MARS) }
+      
+      it { is_expected.to ary_be_within(0.00000001).of expected }
+    end
 
+    describe ".spkezr" do
+      let(:expected) { [ NMatrix.new([6,1], [-97579460.22494915, -111325884.19041583, -53609500.96053864, 191941265.18476546, 0, 0]) , 525.182681546206 ] }
+      
+      subject { SpiceRub::Native.spkezr(:MOON, SpiceRub::Native.str2et("2006 JAN 31 01:00"), :J2000, :NONE, :MARS) }
+      
+      it { is_expected.to ary_be_within(0.00000001).of expected }
+    end
+    
+    describe ".sxform" do
+      let(:expected) { NMatrix.new( [6,6], 
+            [
+              -0.181552128786035,      -0.9833808415169495,    -0.0009721474557003636,   0.0,                     0.0,                   0.0,
+               0.9833813063908512,     -0.18155221353605164,   -1.0875961047432348e-06,  0.0,                     0.0,                   0.0,
+              -0.00017542600129312876, -0.0009561890903792413,  0.9999995274639591,      0.0,                     0.0,                   0.0,
+              -7.170926203563374e-05,   1.3238990046996728e-05, 3.080545126542364e-12,  -0.181552128786035,      -0.9833808415169495,   -0.0009721474557003636,
+              -1.3238996230012214e-05, -7.170929593423952e-05,  6.892766900121194e-15,   0.9833813063908512,     -0.18155221353605164,  -1.0875961047432348e-06,
+              -6.972585576496953e-08,   1.2795296388856552e-08, 2.99475301861348e-15,   -0.00017542600129312876, -0.0009561890903792413, 0.9999995274639591
+            ])
+      }
+      
+      subject { SpiceRub::Native.sxform(:IAU_EARTH, :J2000, SpiceRub::Native.str2et('January 1, 1990')) }
+      
+      it { is_expected.to be_within(0.00000001).of expected }
+    end
+
+    describe ".pxform" do
+      let(:expected) { NMatrix.new( [3,3], 
+            [
+             -0.181552128786035,      -0.9833808415169495,   -0.0009721474557003636,
+              0.9833813063908512,     -0.18155221353605164,  -1.0875961047432348e-06,
+             -0.00017542600129312876, -0.0009561890903792413, 0.9999995274639591     
+            ])
+      }
+      
+      subject { SpiceRub::Native.pxform(:IAU_EARTH, :J2000, SpiceRub::Native.str2et('January 1, 1990')) }
+      
+      it { is_expected.to be_within(0.00000001).of expected }
     end
   end
 end

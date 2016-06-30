@@ -43,9 +43,20 @@ describe "SpiceRub::Native" do
       end
 
       describe ".recpgr" do
-        subject { SpiceRub::Native.recpgr(EXAMPLE_COORDINATES[:rec]) }     
+        let(:expected) { [90.0 * SpiceRub::Native.rpd, 45.0 * SpiceRub::Native.rpd, 300] }
+
+        before do
+          kernel_pool = SpiceRub::KernelPool.instance
+          kernel_pool.clear! unless kernel_pool.empty?
+          kernel_pool.load(TEST_PCK_KERNEL[1])
+        end
+
+        subject { SpiceRub::Native.recpgr(:mars, NMatrix.new([1,3], [  1.604650025e-13,
+                                                                      -2.620678915e+03,
+                                                                       2.592408909e+03 ]), 3396.19,  0.005886007555525526) 
+                }     
         
-        it { is_expected.to ary_be_within(0.0000000001).of EXAMPLE_COORDINATES[:sph] }
+        it { is_expected.to ary_be_within(0.000001).of expected }
       end      
     end
 
@@ -74,9 +85,18 @@ describe "SpiceRub::Native" do
 
     context "when co-ordinates are planetographic" do
       describe ".pgrrec" do
-        subject { SpiceRub::Native.pgrrec(*EXAMPLE_COORDINATES[:pgr]) }     
+        let(:expected) { NMatrix.new([1,3], [ 1.604650025e-13,
+                                             -2.620678915e+03,
+                                              2.592408909e+03 ] ) }
+        before do
+          kernel_pool = SpiceRub::KernelPool.instance
+          kernel_pool.clear! unless kernel_pool.empty?
+          kernel_pool.load(TEST_PCK_KERNEL[1])
+        end          
+
+        subject { SpiceRub::Native.pgrrec(:mars, 90.0 * SpiceRub::Native.rpd, 45.0 * SpiceRub::Native.rpd, 300, 3396.19,  0.005886007555525526) }     
       
-        it { is_expected.to be_within(0.0000000001).of EXAMPLE_COORDINATES[:rec] }
+        it { is_expected.to be_within(0.0000000001).of expected }
       end
 
       describe ".pgrlat" do

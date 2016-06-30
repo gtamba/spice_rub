@@ -1,6 +1,7 @@
 #TODO : Overrides its to accept function parameters
 require 'nmatrix'
 require './lib/spice_rub'
+#require 'rspec/its'
 
 #Include can be moved to separate specs if not used frequently eventually
 include Math
@@ -16,7 +17,7 @@ TEST_FRAME_KERNEL = "sem.tf"
 TEST_SCLK_KERNEL = "mk00062a.tsc"
 
 TEST_KERNELS = { tls: TEST_TLS_KERNEL, bsp: TEST_SPK_KERNEL, pck: TEST_PCK_KERNEL[0]}
-TEST_POOL = [TEST_INVALID_KERNEL, TEST_TLS_KERNEL, TEST_SPK_KERNEL, TEST_PCK_KERNEL[0] ]
+TEST_POOL = [ TEST_INVALID_KERNEL, TEST_TLS_KERNEL, TEST_SPK_KERNEL, TEST_PCK_KERNEL[0] ]
 
 
 TEST_INSTRUMENTS = [-999001, -999002]
@@ -55,6 +56,6 @@ RSpec::Matchers.define :ary_be_within do |delta|
   end
 
   failure_message do |actual|
-    "expected #{actual} to be withing #{delta} of #{@expected}"
+    "expected #{actual} to be within #{delta} of #{@expected}"
   end
 end

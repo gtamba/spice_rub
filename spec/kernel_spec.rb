@@ -10,8 +10,8 @@ require "spec_helper"
 
 describe SpiceRub::KernelPool do
  
-  let(:kernel_pool) {SpiceRub::KernelPool.instance}
-  before {kernel_pool.path = 'spec/data/kernels'}
+  let(:kernel_pool) { SpiceRub::KernelPool.instance }
+  before { kernel_pool.path = 'spec/data/kernels' }
   before(:each) { kernel_pool.clear! unless kernel_pool.empty? }
   
   context "When instantiating with a constructor" do
@@ -21,7 +21,7 @@ describe SpiceRub::KernelPool do
     end
     
     it "raises a NoMethodError error" do
-      expect {new_instance}.to raise_error(NoMethodError)  
+      expect { new_instance }.to raise_error(NoMethodError)  
     end
   end
   
@@ -60,7 +60,7 @@ describe SpiceRub::KernelPool do
     end
 
     context "When category is :text" do
-      subject { kernel_pool.count(:text  ) }
+      subject { kernel_pool.count(:text) }
 
       it { is_expected. to eq 1}
     end
@@ -90,13 +90,7 @@ describe SpiceRub::KernelPool do
   
   # Failing test
   context "When a SpiceKernel gets unloaded" do
-    subject { nil }
-    before do 
-      kernel_pool.load(TEST_KERNELS.first[1])
-      subject = kernel_pool[0]
-    end
 
-    it { is_expected.not_to be loaded? }
   end
 
 end

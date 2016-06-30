@@ -1,5 +1,8 @@
-const size_t VECTOR_SHAPE[2] = {1,3};
-const size_t STATE_SHAPE[2] = {1,6};
+//Forward Declarations of Utility Functions
+bool spice_error(int error_detail);
+sigset_t block_signals();
+void restore_signals(sigset_t old_mask);
+
 //Macros for switch parameters in error message reports
 #define SPICE_ERROR_SHORT 0
 #define SPICE_ERROR_LONG 1

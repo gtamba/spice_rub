@@ -1,16 +1,15 @@
 require 'spec_helper'
                
 
-# test SpiceRub::Native.furnsh, SpiceRub::Native.ktotal, SpiceRub::Native.kclear SpiceRub::Native.unload
+# test spice.furnsh, spice.ktotal, spice.kclear spice.unload
 #
 # Supposed to be tests for furnsh, load, ktotal, kclear : These functions are direct dependencies of the tests in kernel_spec.rb 
 #  Specific tests for the C accessors will be put in later
 #
 
 describe "SpiceRub::Native" do
-  #let(:test_object) { Class.new { extend SpiceRub::Native } }
-
-  #kernel loading function tests here
+  #Global alias to the native namespace
+  let(:spice) { SpiceRub::Native }
 
   describe "functions that inter-convert co-ordinate systems" do
     before(:all) do
@@ -25,25 +24,25 @@ describe "SpiceRub::Native" do
 
     context "when co-ordinates are rectangular" do
       describe ".reclat" do
-        subject { SpiceRub::Native.reclat(EXAMPLE_COORDINATES[:rec]) }     
+        subject { spice.reclat(EXAMPLE_COORDINATES[:rec]) }     
         
         it { is_expected.to ary_be_within(0.0000000001).of(EXAMPLE_COORDINATES[:lat]) }
       end
 
       describe ".recsph" do
-        subject { SpiceRub::Native.recsph(EXAMPLE_COORDINATES[:rec]) }     
+        subject { spice.recsph(EXAMPLE_COORDINATES[:rec]) }     
         
         it { is_expected.to ary_be_within(0.0000000001).of(EXAMPLE_COORDINATES[:sph]) }
       end
       
       describe ".recrad" do
-        subject { SpiceRub::Native.recrad(EXAMPLE_COORDINATES[:rec]) }     
+        subject { spice.recrad(EXAMPLE_COORDINATES[:rec]) }     
         
         it { is_expected.to ary_be_within(0.0000000001).of EXAMPLE_COORDINATES[:rad] }
       end
 
       describe ".recpgr" do
-        let(:expected) { [90.0 * SpiceRub::Native.rpd, 45.0 * SpiceRub::Native.rpd, 300] }
+        let(:expected) { [90.0 * spice.rpd, 45.0 * spice.rpd, 300] }
 
         before do
           kernel_pool = SpiceRub::KernelPool.instance
@@ -51,7 +50,7 @@ describe "SpiceRub::Native" do
           kernel_pool.load(TEST_PCK_KERNEL[1])
         end
 
-        subject { SpiceRub::Native.recpgr(:mars, NMatrix.new([3,1], [  1.604650025e-13,
+        subject { spice.recpgr(:mars, NMatrix.new([3,1], [  1.604650025e-13,
                                                                       -2.620678915e+03,
                                                                        2.592408909e+03 ]), 3396.19,  0.005886007555525526) 
                 }     
@@ -62,7 +61,7 @@ describe "SpiceRub::Native" do
 
     context "when co-ordinates are spherical" do
       describe ".sphrec" do
-        subject { SpiceRub::Native.sphrec(*EXAMPLE_COORDINATES[:sph]) }     
+        subject { spice.sphrec(*EXAMPLE_COORDINATES[:sph]) }     
       
         it { is_expected.to be_within(0.0000000001).of EXAMPLE_COORDINATES[:rec] }
       end
@@ -77,7 +76,7 @@ describe "SpiceRub::Native" do
 
       describe ".recpgr" do
         skip("to be implemented")
-        #subject {SpiceRub::Native.recsph(EXAMPLE_COORDINATES[:rec])}     
+        #subject {spice.recsph(EXAMPLE_COORDINATES[:rec])}     
         
         #it { is_expected.to be_within(0.0000000001).of EXAMPLE_COORDINATES[:sph] }
       end      
@@ -94,7 +93,7 @@ describe "SpiceRub::Native" do
           kernel_pool.load(TEST_PCK_KERNEL[1])
         end          
 
-        subject { SpiceRub::Native.pgrrec(:mars, 90.0 * SpiceRub::Native.rpd, 45.0 * SpiceRub::Native.rpd, 300, 3396.19,  0.005886007555525526) }     
+        subject { spice.pgrrec(:mars, 90.0 * spice.rpd, 45.0 * spice.rpd, 300, 3396.19,  0.005886007555525526) }     
       
         it { is_expected.to be_within(0.0000000001).of expected }
       end
@@ -114,7 +113,7 @@ describe "SpiceRub::Native" do
 
     context "when co-ordinates are latitudinal" do
       describe ".latrec" do
-        subject { SpiceRub::Native.latrec(*EXAMPLE_COORDINATES[:lat]) }     
+        subject { spice.latrec(*EXAMPLE_COORDINATES[:lat]) }     
       
         it { is_expected.to be_within(0.0000000001).of EXAMPLE_COORDINATES[:rec] }
       end
@@ -134,7 +133,7 @@ describe "SpiceRub::Native" do
     
     context "when co-ordinates are range, right ascension, and declination" do
       describe ".radrec" do
-        subject { SpiceRub::Native.latrec(*EXAMPLE_COORDINATES[:lat]) }     
+        subject { spice.latrec(*EXAMPLE_COORDINATES[:lat]) }     
       
         it { is_expected.to be_within(0.0000000001).of EXAMPLE_COORDINATES[:rec] }
       end
@@ -166,13 +165,13 @@ describe "SpiceRub::Native" do
      
     describe ".bodvrd" do
       context "when argument is earth and radii" do
-        subject { SpiceRub::Native.bodvrd(:earth, :RADII, 3) } 
+        subject { spice.bodvrd(:earth, :RADII, 3) } 
         
         it { is_expected.to eq([3, [6378.1366, 6378.1366, 6356.7519]]) }
       end
       
       context "when argument is mars and radii" do
-        subject { SpiceRub::Native.bodvrd(:mars, :RADII, 3) } 
+        subject { spice.bodvrd(:mars, :RADII, 3) } 
         
         it { is_expected.to eq([3, [3396.19, 3396.19, 3376.2]]) }
       end 
@@ -180,13 +179,13 @@ describe "SpiceRub::Native" do
 
     describe ".lspcn" do
       context "when no aberration correction is specificed" do
-        subject { SpiceRub::Native.lspcn(:earth, SpiceRub::Native.str2et("21 March 2005") , :none) }
+        subject { spice.lspcn(:earth, spice.str2et("21 March 2005") , :none) }
          
         it { is_expected.to eq 0.008404415875550564}
       end
 
       context "when aberration correction is :lt" do
-        subject { SpiceRub::Native.lspcn(:moon, SpiceRub::Native.str2et("9 October 2000") , :lt) }
+        subject { spice.lspcn(:moon, spice.str2et("9 October 2000") , :lt) }
       
         it { is_expected.to eq 1.4120962928065335}    
       end
@@ -219,7 +218,7 @@ describe "SpiceRub::Native" do
     
       TEST_INSTRUMENTS.each_with_index do |instrument, index|
         context "When instrument is #{instrument}" do
-          subject { SpiceRub::Native.getfov(instrument, 4, 32, 32) } 
+          subject { spice.getfov(instrument, 4, 32, 32) } 
         
           it { is_expected.to eq(FOV_SOLUTIONS[index]) }
         end
@@ -229,30 +228,30 @@ describe "SpiceRub::Native" do
     #Contrived test, skipping steps deriving the first argument due to lack of features present
     describe ".phaseq" do
       context "When no aberration correction is specified" do
-        subject { SpiceRub::Native.phaseq(SpiceRub::Native.str2et("10 APRIL 2010"), :moon, :sun, :earth, :none) }
+        subject { spice.phaseq(spice.str2et("10 APRIL 2010"), :moon, :sun, :earth, :none) }
         it { is_expected.to eq 2.2494537984650593 }
       end
       
       context "When aberration correction is :lt" do
-        subject { SpiceRub::Native.phaseq(SpiceRub::Native.str2et("10 MARCH 2000") , :moon, :sun, :earth, :lt) }
+        subject { spice.phaseq(spice.str2et("10 MARCH 2000") , :moon, :sun, :earth, :lt) }
         
         it { is_expected.to eq 2.31272690572559 }
       end    
       
       context "When aberration correction is :lt+s " do
-        subject { SpiceRub::Native.phaseq(SpiceRub::Native.str2et("1 January 2005") , :moon, :sun, :mars, :"lt+s") }
+        subject { spice.phaseq(spice.str2et("1 January 2005") , :moon, :sun, :mars, :"lt+s") }
         
         it { is_expected.to eq 0.6347433745513293 }
       end  
       
       context "When aberration correction is :cn" do
-        subject { SpiceRub::Native.phaseq(SpiceRub::Native.str2et("2 MAY 2002") , :moon, :sun, :earth, :cn) }
+        subject { spice.phaseq(spice.str2et("2 MAY 2002") , :moon, :sun, :earth, :cn) }
         
         it { is_expected.to eq 1.1039486416913542 }
       end  
       
       context "When aberration correction is :cn+s " do
-        subject { SpiceRub::Native.phaseq(SpiceRub::Native.str2et("5 APRIL 1999") , :moon, :sun, :mars, :"cn+s") }
+        subject { spice.phaseq(spice.str2et("5 APRIL 1999") , :moon, :sun, :mars, :"cn+s") }
         
         it { is_expected.to eq 2.6980870180829344 }
       end    
@@ -280,13 +279,13 @@ describe "SpiceRub::Native" do
       end                     
   
       context "When intercept elipsoid with aberration correction lt + s" do
-        subject { SpiceRub::Native.subpnt("Intercept:  ellipsoid", :mars, SpiceRub::Native.str2et("2008 August 11 00:00:00") , :iau_mars, :"lt+s", :earth) } 
+        subject { spice.subpnt("Intercept:  ellipsoid", :mars, spice.str2et("2008 August 11 00:00:00") , :iau_mars, :"lt+s", :earth) } 
         
         it {is_expected.to eq SUBPNT_SOLUTIONS[0]}
       end  
       
       context "When near-point elipsoid without aberration correction" do
-        subject { SpiceRub::Native.subpnt("Near point: ellipsoid", :mars, SpiceRub::Native.str2et("2008 August 11 00:00:00") , :iau_mars, :"none", :earth) } 
+        subject { spice.subpnt("Near point: ellipsoid", :mars, spice.str2et("2008 August 11 00:00:00") , :iau_mars, :"none", :earth) } 
         
         it {is_expected.to eq SUBPNT_SOLUTIONS[1]}
       end      
@@ -310,13 +309,13 @@ describe "SpiceRub::Native" do
       end                     
   
       context "When intercept elipsoid with aberration correction lt + s" do
-        subject { SpiceRub::Native.subslr("Intercept: ellipsoid", :mars, SpiceRub::Native.str2et("2008 May 15 00:00:00") , :iau_mars, :"lt+s", :moon) } 
+        subject { spice.subslr("Intercept: ellipsoid", :mars, spice.str2et("2008 May 15 00:00:00") , :iau_mars, :"lt+s", :moon) } 
         
         it {is_expected.to eq SUBSLR_SOLUTIONS[0]}
       end  
       
       context "When near-point elipsoid without aberration correction" do
-        subject { SpiceRub::Native.subslr("Near point: ellipsoid", :mars, SpiceRub::Native.str2et("2008 May 15 00:00:00") , :iau_mars, :"none", :moon) } 
+        subject { spice.subslr("Near point: ellipsoid", :mars, spice.str2et("2008 May 15 00:00:00") , :iau_mars, :"none", :moon) } 
         
         it {is_expected.to eq SUBSLR_SOLUTIONS[1]}
       end      
@@ -347,16 +346,16 @@ describe "SpiceRub::Native" do
                          [226807478.4829023, 228480838.18623024]
                         ]}
       
-        subject { SpiceRub::Native.gfdist(:MOON, 
+        subject { spice.gfdist(:MOON, 
                                           :NONE, 
                                           :EARTH, 
                                           :<, 
                                           400000, 
                                           0, 
-                                          SpiceRub::Native.spd, 
+                                          spice.spd, 
                                           100, 
-                                          [SpiceRub::Native.str2et("2007 JAN 1"), 
-                                           SpiceRub::Native.str2et("2007 APR 1")]
+                                          [spice.str2et("2007 JAN 1"), 
+                                           spice.str2et("2007 APR 1")]
                                          )
                 } 
 
@@ -372,7 +371,7 @@ describe "SpiceRub::Native" do
                          [243812799.60698172, 243812799.60698172]
                         ]}
       
-        subject { SpiceRub::Native.gfsntc(:EARTH, 
+        subject { spice.gfsntc(:EARTH, 
                                           :IAU_EARTH, 
                                           :Ellipsoid, 
                                           :NONE, 
@@ -384,9 +383,9 @@ describe "SpiceRub::Native" do
                                           :"=", 
                                           0, 
                                           0, 
-                                          90 *SpiceRub::Native.spd, 100, 
-                                          [SpiceRub::Native.str2et("2007 JAN 1"), 
-                                           SpiceRub::Native.str2et("2008 JAN 1")])
+                                          90 *spice.spd, 100, 
+                                          [spice.str2et("2007 JAN 1"), 
+                                           spice.str2et("2008 JAN 1")])
                 } 
 
         it { is_expected.to ary_be_within(0.0000001).of(expected) }
@@ -403,7 +402,7 @@ describe "SpiceRub::Native" do
                          [225595098.96333015, 225595098.96333015]
                         ]}
       
-        subject { SpiceRub::Native.gfsep(:MOON,
+        subject { spice.gfsep(:MOON,
                                          :SPHERE, 
                                          :NULL, 
                                          :EARTH, 
@@ -414,10 +413,10 @@ describe "SpiceRub::Native" do
                                          :LOCMAX, 
                                          0, 
                                          0, 
-                                         6  * SpiceRub::Native.spd, 
+                                         6 * spice.spd, 
                                          40, 
-                                         [SpiceRub::Native.str2et("2007 JAN 1"), 
-                                          SpiceRub::Native.str2et("2008 APR 1")])[0,4]
+                                         [spice.str2et("2007 JAN 1"), 
+                                          spice.str2et("2008 APR 1")])[0,4]
                 } 
 
         it { is_expected.to ary_be_within(0.0000001).of(expected) }
@@ -431,7 +430,7 @@ describe "SpiceRub::Native" do
                          [61632614.20334693, 61637750.32880422]
                         ]}
       
-        subject { SpiceRub::Native.gfoclt(:any, 
+        subject { spice.gfoclt(:any, 
                                           :MOON, 
                                           :Ellipsoid, 
                                           :IAU_MOON, 
@@ -441,8 +440,8 @@ describe "SpiceRub::Native" do
                                           :lt, 
                                           :earth, 
                                           180.0, 
-                                          [SpiceRub::Native.str2et("2001 DEC 01 00:00:00 TDB"), 
-                                           SpiceRub::Native.str2et("2002 JAN 01 00:00:00 TDB")])
+                                          [spice.str2et("2001 DEC 01 00:00:00 TDB"), 
+                                           spice.str2et("2002 JAN 01 00:00:00 TDB")])
                 }
 
         it { is_expected.to ary_be_within(0.0000001).of(expected) }
@@ -467,58 +466,58 @@ describe "SpiceRub::Native" do
 
       describe ".timout" do
         context "When picture is YYYY Mon DD, HR:MN:SC ::UTC" do
-          subject { SpiceRub::Native.timout(435443.342, "YYYY Mon DD, HR:MN:SC ::UTC", 40) }
+          subject { spice.timout(435443.342, "YYYY Mon DD, HR:MN:SC ::UTC", 40) }
 
           it { is_expected.to eq "2000 Jan 06, 12:56:19" }
         end
         
         context "When picture is MON DD,YYYY  HR:MN:SC.#### (TDB) ::TDB" do
-          subject { SpiceRub::Native.timout(435443.342, "MON DD,YYYY  HR:MN:SC.#### (TDB) ::TDB", 40)}
+          subject { spice.timout(435443.342, "MON DD,YYYY  HR:MN:SC.#### (TDB) ::TDB", 40)}
 
           it { is_expected.to eq "JAN 06,2000  12:57:23.3420 (TDB)" }
         end
       end
 
       describe ".str2et" do
-        subject { SpiceRub::Native.str2et("Nov 10 2000") }
+        subject { spice.str2et("Nov 10 2000") }
 
         it { is_expected.to be_within(0.00000001).of 27086464.182655092 }
       end
       
       describe ".sce2c" do
-        subject { SpiceRub::Native.sce2c(-77, 10000) }
+        subject { spice.sce2c(-77, 10000) }
 
         it { is_expected.to be_within(0.00000001).of 38768325676.97447 }
       end
      
       describe ".sctiks" do
-        subject { SpiceRub::Native.sctiks(-77, "      0:01:000") }
+        subject { spice.sctiks(-77, "      0:01:000") }
 
         it { is_expected.to eq 80.0 }
       end
       
       describe ".scencd" do
-        subject { SpiceRub::Native.scencd(-77, "0:01:001") }
+        subject { spice.scencd(-77, "0:01:001") }
 
         it { is_expected.to eq 88.0 }
       end
       
       describe ".scs2e" do
-        subject { SpiceRub::Native.scs2e(-77, "11389.29.768") }
+        subject { spice.scs2e(-77, "11389.29.768") }
         
         it { is_expected.to be_within(0.00000001).of -322368174.21305406 }
       end
       
       describe ".scdecd" do
-        subject { SpiceRub::Native.scdecd(-77, 11389, 40) }
+        subject { spice.scdecd(-77, 11389, 40) }
         
         it { is_expected.to eq "1/00000001:51:3:5" }
       end    
 
       describe ".sct2e" do
-        let(:sclkdp) { SpiceRub::Native.scencd(-77, "1/ 1900000:00:00") }
+        let(:sclkdp) { spice.scencd(-77, "1/ 1900000:00:00") }
 
-        subject { SpiceRub::Native.sct2e(-77, sclkdp) }
+        subject { spice.sct2e(-77, sclkdp) }
         
         it { is_expected.to eq -207792586.16380078 }
       end
@@ -537,7 +536,7 @@ describe "SpiceRub::Native" do
     describe ".spkpos" do
       let(:expected) { [ NMatrix.new([3,1], [-97579460.22494915, -111325884.19041583, -53609500.96053864]) , 525.182681546206 ] }
       
-      subject { SpiceRub::Native.spkpos(:MOON, SpiceRub::Native.str2et("2006 JAN 31 01:00"), :J2000, :NONE, :MARS) }
+      subject { spice.spkpos(:MOON, spice.str2et("2006 JAN 31 01:00"), :J2000, :NONE, :MARS) }
       
       it { is_expected.to ary_be_within(0.00000001).of expected }
     end
@@ -545,7 +544,7 @@ describe "SpiceRub::Native" do
     describe ".spkezr" do
       let(:expected) { [ NMatrix.new([6,1], [-97579460.22494915, -111325884.19041583, -53609500.96053864, 191941265.18476546, 0, 0]) , 525.182681546206 ] }
       
-      subject { SpiceRub::Native.spkezr(:MOON, SpiceRub::Native.str2et("2006 JAN 31 01:00"), :J2000, :NONE, :MARS) }
+      subject { spice.spkezr(:MOON, spice.str2et("2006 JAN 31 01:00"), :J2000, :NONE, :MARS) }
       
       it { is_expected.to ary_be_within(0.00000001).of expected }
     end
@@ -562,7 +561,7 @@ describe "SpiceRub::Native" do
             ])
       }
       
-      subject { SpiceRub::Native.sxform(:IAU_EARTH, :J2000, SpiceRub::Native.str2et('January 1, 1990')) }
+      subject { spice.sxform(:IAU_EARTH, :J2000, spice.str2et('January 1, 1990')) }
       
       it { is_expected.to be_within(0.00000001).of expected }
     end
@@ -576,7 +575,7 @@ describe "SpiceRub::Native" do
             ])
       }
       
-      subject { SpiceRub::Native.pxform(:IAU_EARTH, :J2000, SpiceRub::Native.str2et('January 1, 1990')) }
+      subject { spice.pxform(:IAU_EARTH, :J2000, spice.str2et('January 1, 1990')) }
       
       it { is_expected.to be_within(0.00000001).of expected }
     end

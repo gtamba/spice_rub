@@ -53,5 +53,8 @@ VALUE sr_spd(VALUE self);
 //Ephemerides Function Declarations
 VALUE sr_spkpos(VALUE self, VALUE targ, VALUE et, VALUE ref, VALUE abcorr, VALUE obs);
 VALUE sr_spkezr(VALUE self, VALUE targ, VALUE et, VALUE ref, VALUE abcorr, VALUE obs);
+VALUE sr_spkcpo(VALUE self, VALUE target, VALUE et, VALUE outref, VALUE refloc, VALUE abcorr, VALUE obspos, VALUE obsctr, VALUE obsref);
+VALUE sr_spkcvo(VALUE self, VALUE target, VALUE et, VALUE outref, VALUE refloc, VALUE abcorr, VALUE obssta, VALUE obsepc, VALUE obsctr, VALUE obsref);
+VALUE sr_spkcpt(VALUE self, VALUE trgpos, VALUE trgctr, VALUE trgref, VALUE et, VALUE outref, VALUE refloc, VALUE abcorr, VALUE obsrvr);
 VALUE sr_pxform(VALUE self, VALUE from , VALUE to , VALUE at);
 VALUE sr_sxform(VALUE self, VALUE from , VALUE to , VALUE at);

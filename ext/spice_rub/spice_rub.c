@@ -135,11 +135,11 @@ void Init_spice_rub() {
   //Attach Ephemerides routines
   rb_define_module_function(spicerub_nested_module, "spkpos", sr_spkpos , 5);
   rb_define_module_function(spicerub_nested_module, "spkezr", sr_spkezr , 5);
+  rb_define_module_function(spicerub_nested_module, "spkcpt", sr_spkcpt , 8);
+  rb_define_module_function(spicerub_nested_module, "spkcvo", sr_spkcvo , 9);
+  rb_define_module_function(spicerub_nested_module, "spkcpo", sr_spkcpo , 8);
   rb_define_module_function(spicerub_nested_module, "pxform", sr_pxform , 3);
   rb_define_module_function(spicerub_nested_module, "sxform", sr_sxform , 3);
-
-
-
-
+  
   rb_spice_error = rb_define_class("SpiceError", rb_eStandardError);
 }

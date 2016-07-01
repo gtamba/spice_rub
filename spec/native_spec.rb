@@ -17,7 +17,6 @@ describe "SpiceRub::Native" do
                              :lat =>  [1.0, PI / 2 , 0.0], 
                              :rec =>  NMatrix.new([3,1], [0.0, 1, 0.0]) , 
                              :sph =>  [1.0, PI / 2, PI / 2],
-                             :pgr =>  1, 
                              :rad =>  [1.0, PI / 2, 0.0]
                             }
     end

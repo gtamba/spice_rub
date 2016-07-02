@@ -14,7 +14,7 @@ calculations using various JPL ephemerides files.
 
 == Requirements
 
-An existing CSPICE installation or download the toolkit package and simply extract the binary. Find an appropriate installation for your architecture {here}[https://naif.jpl.nasa.gov/naif/toolkit_C.html].
+An existing CSPICE installation or download the toolkit package and simply extract the binary file +cspice.a+. Find an appropriate installation for your architecture {here}[https://naif.jpl.nasa.gov/naif/toolkit_C.html]. Please run +bundle install+ in your terminal from the Gem directory to make sure you have all the required Ruby dependencies.
 
 == Installation
 
@@ -22,13 +22,17 @@ Clone repository :
 
   git clone https://github.com/gau27/spice_rub.git
 
-Move CSPICE binary library to the right extension folder (must be renamed to libcspice.a) :
+Copy CSPICE binary library to the right extension folder (must be renamed to libcspice.a) :
 
-  mv path/to/cspice.a ext/spice_rub/cspice/lib/libcspice.a
+  cp path/to/cspice.a ext/spice_rub/cspice/lib/libcspice.a
 
 Compile the gem :
   
   bundle exec rake compile
+  
+Run test suite to see if everything works :
+  
+  rspec
 
 Try out the code without installing the gem :
 
@@ -40,7 +44,15 @@ Install as a gem :
   
 == Features
 
-Kernel Loading Functions (In development)
+Kernel Loading Functions
+
+Geometric Co-Ordinate Conversion Functions
+
+Basic Time Conversion and Encoding Functions
+
+Time windows for Observer-Target constraints
+
+Basic Ephemerides Functions [In development]
 
 == License
 

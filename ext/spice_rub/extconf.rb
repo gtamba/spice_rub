@@ -16,7 +16,7 @@ dir_config('spice_rub', HEADER_DIRS, LIB_DIRS)
 
 $LOCAL_LIBS << "-lcspice"
 
-find_header("nmatrix.h")
+abort "Cannot locate NMatrix header files : nmatrix.h" find_header("nmatrix.h")
 abort "Cannot locate necessary header files : SpiceUsr.h" unless find_header("SpiceUsr.h")
 abort "C SPICE Library is not exposed (Incorrect Configuration/Invalid installation)" unless find_library("cspice", "furnsh_c")
 abort "C SPICE Library is not exposed (Incorrect Configuration/Invalid installation)" unless find_library("cspice", "spkez_c")

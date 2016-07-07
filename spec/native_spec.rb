@@ -1,6 +1,6 @@
 require 'spec_helper'
                
-
+# TODO
 # test spice.furnsh, spice.ktotal, spice.kclear spice.unload
 #
 # Supposed to be tests for furnsh, load, ktotal, kclear : These functions are direct dependencies of the tests in kernel_spec.rb 
@@ -578,6 +578,21 @@ describe "SpiceRub::Native" do
       
       it { is_expected.to be_within(0.00000001).of expected }
     end
+
+    describe ".pxfrm2" do
+      let(:expected) { NMatrix.new( [3,3], 
+            [   -0.8189920214285545,    -0.5738046002067962,     0.0005912849471995538,
+                 0.5738047003181147,    -0.8189921647321643,    -4.0234320689515344e-07,
+                 0.00048448860526348445, 0.00033895256605412914, 0.9999998251909594
+            ]) 
+      }
+      
+      subject { spice.pxfrm2(:IAU_EARTH, :J2000, spice.str2et("2006 JAN 31 01:00"), spice.str2et("2007 JAN 31 01:00")) }
+      
+      it { is_expected.to be_within(0.00000001).of expected }
+    end
+
+
   end
 end
   

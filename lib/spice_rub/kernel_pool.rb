@@ -116,6 +116,7 @@ module SpiceRub
     def clear!
       unless empty?
         if SpiceRub::Native.kclear
+          self.loaded.each { |kernel| kernel.mark_unloaded }
           @pool = []
           return true
         end
@@ -201,9 +202,13 @@ module SpiceRub
           false
         end
       end
-
+      
       def loaded?
         @loaded
+      end
+
+      def mark_unloaded
+        @loaded = false 
       end
     end
     #private_constant :SpiceKernel

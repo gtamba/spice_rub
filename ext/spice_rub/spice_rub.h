@@ -56,5 +56,9 @@ VALUE sr_spkezr(VALUE self, VALUE targ, VALUE et, VALUE ref, VALUE abcorr, VALUE
 VALUE sr_spkcpo(VALUE self, VALUE target, VALUE et, VALUE outref, VALUE refloc, VALUE abcorr, VALUE obspos, VALUE obsctr, VALUE obsref);
 VALUE sr_spkcvo(VALUE self, VALUE target, VALUE et, VALUE outref, VALUE refloc, VALUE abcorr, VALUE obssta, VALUE obsepc, VALUE obsctr, VALUE obsref);
 VALUE sr_spkcpt(VALUE self, VALUE trgpos, VALUE trgctr, VALUE trgref, VALUE et, VALUE outref, VALUE refloc, VALUE abcorr, VALUE obsrvr);
+VALUE sr_spkcvt(VALUE self, VALUE trgsta, VALUE trgepc, VALUE trgctr, VALUE trgref, VALUE et, VALUE outref, VALUE refloc, VALUE abcorr, VALUE obsrvr);
 VALUE sr_pxform(VALUE self, VALUE from , VALUE to , VALUE at);
 VALUE sr_sxform(VALUE self, VALUE from , VALUE to , VALUE at);
+VALUE sr_pxfrm2(VALUE self, VALUE from , VALUE to , VALUE epoch_at, VALUE epoch_to);
+VALUE sr_spkobj(VALUE self, VALUE spk_file);
+VALUE sr_pckfrm(VALUE self, VALUE pck_file);

@@ -115,7 +115,7 @@ void Init_spice_rub() {
   rb_define_module_function(spicerub_nested_module, "bodvcd", sr_bodvcd, 3);
 
 
-  //Atttach Time and Time Conversion functions
+  //Atttach Time and Time Conversion functions to module
   rb_define_module_function(spicerub_nested_module, "str2et", sr_str2et, 1);
   rb_define_module_function(spicerub_nested_module, "gfdist", sr_gfdist, 9);
   rb_define_module_function(spicerub_nested_module, "gfsntc", sr_gfsntc, 15);
@@ -132,14 +132,18 @@ void Init_spice_rub() {
   rb_define_module_function(spicerub_nested_module, "sct2e", sr_sct2e , 2);
   rb_define_module_function(spicerub_nested_module, "spd", sr_spd, 0);
 
-  //Attach Ephemerides routines
+  //Attach Ephemerides routines to module
   rb_define_module_function(spicerub_nested_module, "spkpos", sr_spkpos , 5);
   rb_define_module_function(spicerub_nested_module, "spkezr", sr_spkezr , 5);
   rb_define_module_function(spicerub_nested_module, "spkcpt", sr_spkcpt , 8);
   rb_define_module_function(spicerub_nested_module, "spkcvo", sr_spkcvo , 9);
+  rb_define_module_function(spicerub_nested_module, "spkcvt", sr_spkcvt , 9);
   rb_define_module_function(spicerub_nested_module, "spkcpo", sr_spkcpo , 8);
   rb_define_module_function(spicerub_nested_module, "pxform", sr_pxform , 3);
+  rb_define_module_function(spicerub_nested_module, "pxfrm2", sr_pxfrm2 , 4);
   rb_define_module_function(spicerub_nested_module, "sxform", sr_sxform , 3);
-  
+  rb_define_module_function(spicerub_nested_module, "pckfrm", sr_pckfrm , 1);
+  rb_define_module_function(spicerub_nested_module, "spkobj", sr_spkobj , 1);
+
   rb_spice_error = rb_define_class("SpiceError", rb_eStandardError);
 }

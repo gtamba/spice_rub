@@ -50,8 +50,8 @@ describe "SpiceRub::Native" do
         end
 
         subject { spice.recpgr(:mars, NMatrix.new([3,1], [  1.604650025e-13,
-                                                                      -2.620678915e+03,
-                                                                       2.592408909e+03 ]), 3396.19,  0.005886007555525526) 
+                                                            -2.620678915e+03,
+                                                             2.592408909e+03 ]), 3396.19,  0.005886007555525526) 
                 }     
         
         it { is_expected.to ary_be_within(0.000001).of expected }
@@ -69,16 +69,9 @@ describe "SpiceRub::Native" do
         skip("to be implemented")
       end
       
-      describe ".sphrad" do
+      describe ".sphcyl" do
         skip("to be implemented")
       end
-
-      describe ".recpgr" do
-        skip("to be implemented")
-        #subject {spice.recsph(EXAMPLE_COORDINATES[:rec])}     
-        
-        #it { is_expected.to be_within(0.0000000001).of EXAMPLE_COORDINATES[:sph] }
-      end      
     end
 
     context "when co-ordinates are planetographic" do
@@ -95,19 +88,7 @@ describe "SpiceRub::Native" do
         subject { spice.pgrrec(:mars, 90.0 * spice.rpd, 45.0 * spice.rpd, 300, 3396.19,  0.005886007555525526) }     
       
         it { is_expected.to be_within(0.0000000001).of expected }
-      end
-
-      describe ".pgrlat" do
-        skip("to be implemented")
-      end
-      
-      describe ".pgrrad" do
-        skip("to be implemented")
-      end
-
-      describe ".pgrsph" do
-        skip("to be implemented")     
-      end    
+      end  
     end
 
     context "when co-ordinates are latitudinal" do
@@ -117,17 +98,13 @@ describe "SpiceRub::Native" do
         it { is_expected.to be_within(0.0000000001).of EXAMPLE_COORDINATES[:rec] }
       end
 
-      describe ".latpgr" do
-        skip("to be implemented")
-      end
-      
-      describe ".latrad" do
-        skip("to be implemented")
-      end
-
       describe ".latsph" do
         skip("to be implemented")      
       end       
+      
+      describe ".latcyl" do
+        skip("to be implemented")
+      end
     end
     
     context "when co-ordinates are range, right ascension, and declination" do
@@ -136,18 +113,6 @@ describe "SpiceRub::Native" do
       
         it { is_expected.to be_within(0.0000000001).of EXAMPLE_COORDINATES[:rec] }
       end
-
-      describe ".radpgr" do
-        skip("to be implemented")
-      end
-      
-      describe ".radlat" do
-        skip("to be implemented")
-      end
-
-      describe ".radsph" do
-        skip("to be implemented")      
-      end       
     end    
   end
  

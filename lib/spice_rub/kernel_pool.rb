@@ -24,7 +24,7 @@ module SpiceRub
     # have been loaded previously.
     attr_reader :pool
     
-    # Path variable which can be set for convenience if all requires kernels
+    # Path variable which can be set for convenience if all required kernels
     # are in the same file directory, nil by default.
     attr_accessor :path
 
@@ -52,6 +52,10 @@ module SpiceRub
       @pool[kernel]
     end
     
+    def each
+      @pool.each {|kernel| yield kernel}
+    end
+
     #
     # call-seq:
     #     loaded -> List of SpiceKernel objects

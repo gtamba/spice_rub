@@ -113,6 +113,8 @@ void Init_spice_rub() {
   rb_define_module_function(spicerub_nested_module, "rpd", sr_rpd, 0);
   rb_define_module_function(spicerub_nested_module, "bodvrd", sr_bodvrd, 3);
   rb_define_module_function(spicerub_nested_module, "bodvcd", sr_bodvcd, 3);
+  rb_define_module_function(spicerub_nested_module, "latsph", sr_latsph, 3);
+  rb_define_module_function(spicerub_nested_module, "sphlat", sr_sphlat, 3);
 
 
   //Atttach Time and Time Conversion functions to module

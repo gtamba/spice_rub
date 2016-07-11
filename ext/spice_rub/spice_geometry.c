@@ -350,3 +350,23 @@ VALUE sr_bodvcd(VALUE self, VALUE bodynm, VALUE item, VALUE maxn) {
 
   return rb_ary_new3(2, INT2FIX(dim), rb_values);
 }
+
+VALUE sr_latsph(VALUE self, VALUE radius, VALUE longitude, VALUE latitude) {
+  double rho, 
+         colat, 
+         lons;
+
+  latsph_c(NUM2DBL(radius), NUM2DBL(longitude), NUM2DBL(latitude),  &rho, &colat, &lons);
+  
+  return rb_ary_new3(3, DBL2NUM(rho), DBL2NUM(colat), DBL2NUM(lons));
+}
+
+VALUE sr_sphlat(VALUE self, VALUE radius, VALUE colatitude, VALUE longitude) {
+  double lat_radius,
+         lat_longitude,
+         lat_latitude;
+
+  sphlat_c(NUM2DBL(radius), NUM2DBL(colatitude), NUM2DBL(longitude), &lat_radius, &lat_longitude, &lat_latitude);
+
+  return rb_ary_new3(3, DBL2NUM(lat_radius), DBL2NUM(lat_longitude), DBL2NUM(lat_latitude));
+}

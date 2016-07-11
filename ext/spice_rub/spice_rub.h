@@ -19,6 +19,8 @@ VALUE sr_subpnt(VALUE self, VALUE method, VALUE target, VALUE et, VALUE fixref, 
 VALUE sr_subslr(VALUE self, VALUE method, VALUE target, VALUE et, VALUE fixref, VALUE abcorr, VALUE obsrvr);
 VALUE sr_recsph(VALUE self, VALUE rectangular);
 VALUE sr_sphrec(VALUE self, VALUE radius, VALUE colatitude, VALUE longitude);
+VALUE sr_sphlat(VALUE self, VALUE radius, VALUE colatitude, VALUE longitude);
+VALUE sr_latsph(VALUE self, VALUE radius, VALUE longtitude, VALUE latitude);
 VALUE sr_phaseq(VALUE self, VALUE et, VALUE target, VALUE illmn, VALUE obsrvr, VALUE abcorr);
 VALUE sr_recrad(VALUE self, VALUE rectangular);
 VALUE sr_radrec(VALUE self, VALUE range, VALUE right_ascension, VALUE declination);

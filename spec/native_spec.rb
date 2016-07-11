@@ -17,7 +17,7 @@ describe "SpiceRub::Native" do
                              :lat =>  [1.0, PI / 2 , 0.0], 
                              :rec =>  NMatrix.new([3,1], [0.0, 1, 0.0]) , 
                              :sph =>  [1.0, PI / 2, PI / 2],
-                             :rad =>  [1.0, PI / 2, 0.0]
+                             :rad =>  [1.0, PI / 2, 0.0],
                             }
     end
 
@@ -39,6 +39,10 @@ describe "SpiceRub::Native" do
         
         it { is_expected.to ary_be_within(0.0000000001).of EXAMPLE_COORDINATES[:rad] }
       end
+      
+      describe '.reccyl' do
+        skip("pending implementation")
+      end
 
       describe ".recpgr" do
         let(:expected) { [90.0 * spice.rpd, 45.0 * spice.rpd, 300] }
@@ -56,6 +60,14 @@ describe "SpiceRub::Native" do
         
         it { is_expected.to ary_be_within(0.000001).of expected }
       end      
+      
+      describe ".recgeo" do
+        let(:expected) { [0.0, 90.0 * spice.rpd, -6356.583800130925] }
+
+        subject { SpiceRub::Native.recgeo(NMatrix.new([3,1], 0.0), 6378.2064, 1.0 / 294.9787) }
+
+        it { is_expected.to ary_be_within(0.000001).of expected }
+      end
     end
 
     context "when co-ordinates are spherical" do
@@ -119,6 +131,18 @@ describe "SpiceRub::Native" do
       end
     end    
   end
+  
+  context "when co-ordinates are geodetic" do
+    describe ".georec" do
+      let(:expected) { NMatrix.new([3,1], 0.0) }
+
+      subject { SpiceRub::Native.georec(*[0.0, 90.0 * spice.rpd, -6356.583800130925], 6378.2064, 1.0 / 294.9787) }
+
+      it { is_expected.to be_within(0.000001).of expected }
+    end
+        
+  end
+
  
   describe "Functions that calculate various geometry measures using Kernel Data" do
     before(:all) do

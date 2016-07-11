@@ -311,6 +311,16 @@ VALUE sr_pgrrec(VALUE self, VALUE body, VALUE longitude, VALUE latitude, VALUE a
   return rb_nmatrix_dense_create(FLOAT64, (size_t *) GEO_VECTOR_SHAPE, 2, (void *) vector, 3);
 }
 
+VALUE sr_srfrec(VALUE self, VALUE body, VALUE longitude, VALUE latitude) {
+  double vector[3];
+
+  srfrec_c(FIX2INT(body), NUM2DBL(longitude), NUM2DBL(latitude), vector);
+
+  if(spice_error(SPICE_ERROR_SHORT)) return Qnil;
+
+  return rb_nmatrix_dense_create(FLOAT64, (size_t *) GEO_VECTOR_SHAPE, 2, (void *) vector, 3);
+}
+
 VALUE sr_dpr(VALUE self) {
   return DBL2NUM(dpr_c());
 }

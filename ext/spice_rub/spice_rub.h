@@ -1,3 +1,10 @@
+#include "ruby.h"
+#include "SpiceUsr.h"
+#include "signal.h"
+#include <stdbool.h>
+#include "nmatrix.h"
+
+
 //Top level IMPLICIT Declarations
 
 VALUE spicerub_top_module;
@@ -28,6 +35,7 @@ VALUE sr_recgeo(VALUE self, VALUE rectangular, VALUE radius_equatorial, VALUE fl
 VALUE sr_georec(VALUE self, VALUE longitude, VALUE latitude, VALUE altitude, VALUE radius_equatorial, VALUE flattening);
 VALUE sr_recpgr(VALUE self, VALUE body, VALUE rectangular, VALUE radius_equatorial, VALUE flattening);
 VALUE sr_pgrrec(VALUE self, VALUE body, VALUE longitude, VALUE latitude, VALUE altitude, VALUE radius_equatorial, VALUE flattening);
+VALUE sr_srfrec(VALUE self, VALUE body, VALUE longitude, VALUE latitude);
 VALUE sr_dpr(VALUE self);
 VALUE sr_rpd(VALUE self);
 VALUE sr_getfov(VALUE self, VALUE instid, VALUE room, VALUE shapelen, VALUE framelen);

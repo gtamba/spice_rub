@@ -1,10 +1,6 @@
-#include "ruby.h"
-#include "SpiceUsr.h"
-#include "signal.h"
-#include <stdbool.h>
+
 #include "spice_rub.h"
 #include "spice_rub_utils.h"
-#include "nmatrix.h"
 
 /* This is a thread safety mechanism. CSPICE uses various unix signals and it is prudent to block them while 
  kernels are being loaded to ensure two threads do not interfere. This was inspired by similar blocks in place
@@ -115,6 +111,7 @@ void Init_spice_rub() {
   rb_define_module_function(spicerub_nested_module, "bodvcd", sr_bodvcd, 3);
   rb_define_module_function(spicerub_nested_module, "latsph", sr_latsph, 3);
   rb_define_module_function(spicerub_nested_module, "sphlat", sr_sphlat, 3);
+  rb_define_module_function(spicerub_nested_module, "srfrec", sr_srfrec, 3);
 
 
   //Atttach Time and Time Conversion functions to module

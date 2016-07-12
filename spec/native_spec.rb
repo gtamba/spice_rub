@@ -64,7 +64,7 @@ describe "SpiceRub::Native" do
       describe ".recgeo" do
         let(:expected) { [0.0, 90.0 * spice.rpd, -6356.583800130925] }
 
-        subject { SpiceRub::Native.recgeo(NMatrix.new([3,1], 0.0), 6378.2064, 1.0 / 294.9787) }
+        subject { spice.recgeo(NMatrix.new([3,1], 0.0), 6378.2064, 1.0 / 294.9787) }
 
         it { is_expected.to ary_be_within(0.000001).of expected }
       end
@@ -90,7 +90,7 @@ describe "SpiceRub::Native" do
 
     context "when co-ordinates are planetographic" do
       describe ".pgrrec" do
-        let(:expected) { NMatrix.new([3,1], [ 1.604650025e-13,
+        let(:expected) { NMatrix.new([3,1], [ 0              ,
                                              -2.620678915e+03,
                                               2.592408909e+03 ] ) }
         before do
@@ -136,11 +136,26 @@ describe "SpiceRub::Native" do
     describe ".georec" do
       let(:expected) { NMatrix.new([3,1], 0.0) }
 
-      subject { SpiceRub::Native.georec(*[0.0, 90.0 * spice.rpd, -6356.583800130925], 6378.2064, 1.0 / 294.9787) }
+      subject { spice.georec(*[0.0, 90.0 * spice.rpd, -6356.583800130925], 6378.2064, 1.0 / 294.9787) }
 
       it { is_expected.to be_within(0.000001).of expected }
     end
         
+  end
+  
+  describe "when co-ordinates are a planetocentric latitude and longitutde of a body surface point" do
+    let(:expected) { NMatrix.new([3,1], [ -906.2491947398686,
+                                           5139.594582171407,
+                                          -3654.299896371338 ] ) }
+    before do
+      kernel_pool = SpiceRub::KernelPool.instance
+      kernel_pool.clear! unless kernel_pool.empty?
+      kernel_pool.load(TEST_PCK_KERNEL[1])
+    end     
+    
+    subject { spice.srfrec(399, 100 * spice.rpd, -35 * spice.rpd) }
+
+    it { is_expected.to be_within(0.000001).of expected }
   end
 
  

@@ -109,7 +109,7 @@ module SpiceRub
       @pool ||= []
 
       #TODO : Refine to only read valid kernel extensions
-      kernels = Dir[File.join(folder, "*")]
+      kernels = Dir[File.join(folder, "*.*")]
       
       raise(ArgumentError, "No files found in specified directory") if kernels.empty?
 

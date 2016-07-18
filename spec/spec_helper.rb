@@ -39,9 +39,16 @@ RSpec::Matchers.define :ary_be_within do |delta|
     unless @expected
       raise ArgumentError, "This matcher should be used as ary_be_withing(#{delta}).of(expected_value)"
     end
-
+    
+    #Verify that the two arrays have the same number of dimensions
+    if dimension(actual) != dimension(@expected)
+      raise ArgumentError, "Actual and expected array dimensions differ: #{dimension(actual)} vs #{dimension(@expected)}"
+    end
+    
     actual.flatten!
+    @expected.flatten!
 
+    #If the dimensions and number of elements are equal, then the arrays have equal shape and can be compared
     if actual.size != @expected.size
       raise ArgumentError, "Actual and expected array sizes differ: #{actual.size} vs #{@expected.size}"
     end
@@ -50,9 +57,15 @@ RSpec::Matchers.define :ary_be_within do |delta|
   end
 
   def of(expected)
-    @expected = expected.flatten
+    @expected = expected
 
     self
+  end
+  
+  #Recursive function to calculate number of nested arrays within a Ruby array 
+  def dimension(array, dimension=1) 
+    array = array.first
+    Array === array ? dimension(array, dimension + 1) : dimension
   end
 
   failure_message do |actual|

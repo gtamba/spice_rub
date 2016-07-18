@@ -88,6 +88,20 @@ describe SpiceRub::KernelPool do
     it { is_expected.to be_empty }
   end
   
+  context "When loading all the kernels from @path without specifying folder" do
+    subject { kernel_pool.load_all }
+    
+    #This test output will change as more files are added to spec/data/kernels  
+    it { is_expected.to eq 8 }
+  end
+  
+  context "When loading all the kernels from a specified folder" do
+    subject { kernel_pool.load_all("spec/data/kernels") }
+    
+    #This test output will change as more files are added to spec/data/kernels  
+    it { is_expected.to eq 8 }
+  end
+
   # Failing test
   context "When a SpiceKernel gets unloaded" do
 

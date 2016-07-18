@@ -103,6 +103,23 @@ module SpiceRub
       @pool.length - 1
     end
 
+    def load_all(folder = @path)
+      raise(ArgumentError, 'No folder path specified') unless folder
+      
+      @pool ||= []
+
+      #TODO : Refine to only read valid kernel extensions
+      kernels = Dir[File.join(folder, "*")]
+      
+      raise(ArgumentError, "No files found in specified directory") if kernels.empty?
+
+      kernels.each do |kernel|
+        @pool << SpiceKernel.new(kernel) if SpiceRub::Native.furnsh(kernel)
+      end
+      
+      self.count
+    end
+
     #
     # call-seq:
     #     clear! -> TrueClass/FalseClass

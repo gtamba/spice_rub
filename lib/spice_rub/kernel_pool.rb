@@ -144,7 +144,7 @@ module SpiceRub
       end
       false
     end
-
+    alias :unload_all! :clear!
     #
     # call-seq:
     #     count -> FixNum
@@ -190,12 +190,14 @@ module SpiceRub
     # kernel files, is not visible outside KernelPool.
     class SpiceKernel
       attr_reader :path_to, :loaded
-
+      
+      alias :path :path_to
+      
       def initialize(path)
         @path_to = path
         @loaded  = true
       end
-
+    
       #
       # call-seq:
       #     unload! -> TrueClass/FalseClass

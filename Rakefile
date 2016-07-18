@@ -43,8 +43,12 @@ Gem::PackageTask.new(gemspec).define
 require 'rspec/core/rake_task'
 require 'rspec/core'
 
+task :default => :spec
 
-task :spec => "spec:all"
+desc "Run rspec on tests"
+RSpec::Core::RakeTask.new do |t|
+  t.pattern = "spec/**/*_spec.rb"
+end
 
 task :console do |task|
   cmd = [ 'irb', "-r './lib/spice_rub.rb'" ]
@@ -56,7 +60,6 @@ task :pry do |task|
   run *cmd
 end
 
-task :default => :spec
 
 def run *cmd
   sh(cmd.join(" "))

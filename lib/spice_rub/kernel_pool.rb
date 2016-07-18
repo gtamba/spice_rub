@@ -99,11 +99,12 @@ module SpiceRub
       @pool ||= []
 
       file = File.join(@path, file) if @path and not absolute
-      @pool << SpiceKernel.new(file) if SpiceRub::Native.furnsh(file)
+      loaded_kernel = SpiceKernel.load(file)
+      @pool << loaded_kernel if loaded_kernel
       @pool.length - 1
     end
 
-    def load_all(folder = @path)
+    def load_folder(folder = @path)
       raise(ArgumentError, 'No folder path specified') unless folder
       
       @pool ||= []
@@ -111,10 +112,11 @@ module SpiceRub
       #TODO : Refine to only read valid kernel extensions
       kernels = Dir[File.join(folder, "*.*")]
       
-      raise(ArgumentError, "No files found in specified directory") if kernels.empty?
+      self.count if kernels.empty?
 
       kernels.each do |kernel|
-        @pool << SpiceKernel.new(kernel) if SpiceRub::Native.furnsh(kernel)
+        loaded_kernel = SpiceKernel.load(kernel)
+        @pool << loaded_kernel if loaded_kernel
       end
       
       self.count
@@ -192,7 +194,11 @@ module SpiceRub
       attr_reader :path_to, :loaded
       
       alias :path :path_to
-      
+
+      def self.load(kernel)
+        SpiceRub::Native.furnsh(kernel) ? SpiceKernel.new(kernel) : nil
+      end
+
       def initialize(path)
         @path_to = path
         @loaded  = true

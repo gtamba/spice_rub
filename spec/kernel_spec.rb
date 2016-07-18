@@ -89,14 +89,14 @@ describe SpiceRub::KernelPool do
   end
   
   context "When loading all the kernels from @path without specifying folder" do
-    subject { kernel_pool.load_all }
+    subject { kernel_pool.load_folder }
     
     #This test output will change as more files are added to spec/data/kernels  
     it { is_expected.to eq 8 }
   end
   
   context "When loading all the kernels from a specified folder" do
-    subject { kernel_pool.load_all("spec/data/kernels") }
+    subject { kernel_pool.load_folder("spec/data/kernels") }
     
     #This test output will change as more files are added to spec/data/kernels  
     it { is_expected.to eq 8 }

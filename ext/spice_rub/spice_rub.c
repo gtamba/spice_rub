@@ -143,6 +143,8 @@ void Init_spice_rub() {
   rb_define_module_function(spicerub_nested_module, "sxform", sr_sxform , 3);
   rb_define_module_function(spicerub_nested_module, "pckfrm", sr_pckfrm , 1);
   rb_define_module_function(spicerub_nested_module, "spkobj", sr_spkobj , 1);
-
+  rb_define_module_function(spicerub_nested_module, "bodc2n", sr_bodc2n, 1);
+  rb_define_module_function(spicerub_nested_module, "bodn2c", sr_bodn2c, 1);
+  
   rb_spice_error = rb_define_class("SpiceError", rb_eStandardError);
 }

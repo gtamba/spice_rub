@@ -166,3 +166,30 @@ VALUE sr_spkobj(VALUE self, VALUE spk_file) {
   return Qnil;
   //#TODO : Extract data from the SPICECELL
 }
+
+VALUE sr_bodn2c(VALUE self, VALUE body_name) {
+  SpiceBoolean found;
+  int code;
+
+  bodn2c_c(RB_SYM2STR(body_name), &code, &found);
+  
+  if(spice_error(SPICE_ERROR_SHORT)) return Qnil;
+  
+  if(found) return INT2FIX(code);
+  else return Qnil;
+}
+
+VALUE sr_bodc2n(VALUE self, VALUE code_name) {
+  SpiceBoolean found;
+  char * name = ALLOC_N(char, 32);
+  VALUE rb_symbol = Qnil;
+  
+  bodc2n_c(FIX2INT(code_name), 32, name, &found);
+  
+  if(spice_error(SPICE_ERROR_SHORT)) return Qnil;
+  
+  if(found) rb_symbol = RB_STR2SYM(name);
+
+  xfree(name);
+  return rb_symbol;
+}

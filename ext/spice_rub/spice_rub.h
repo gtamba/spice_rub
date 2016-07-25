@@ -72,3 +72,6 @@ VALUE sr_sxform(VALUE self, VALUE from , VALUE to , VALUE at);
 VALUE sr_pxfrm2(VALUE self, VALUE from , VALUE to , VALUE epoch_at, VALUE epoch_to);
 VALUE sr_spkobj(VALUE self, VALUE spk_file);
 VALUE sr_pckfrm(VALUE self, VALUE pck_file);
+VALUE sr_bodn2c(VALUE self, VALUE body_name);
+VALUE sr_bodc2n(VALUE self, VALUE code_name);
+VALUE sr_bods2c(VALUE self, VALUE string_name);

@@ -112,8 +112,6 @@ module SpiceRub
       #TODO : Refine to only read valid kernel extensions
       kernels = Dir[File.join(folder, "*.*")]
       
-      self.count if kernels.empty?
-
       kernels.each do |kernel|
         loaded_kernel = SpiceKernel.load(kernel)
         @pool << loaded_kernel if loaded_kernel

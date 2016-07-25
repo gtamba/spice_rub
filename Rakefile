@@ -56,7 +56,7 @@ task :console do |task|
 end
 
 task :pry do |task|
-  cmd = [ 'pry', "-r './lib/spice_rub.rb' " ]
+  cmd = [ 'pry', "-r './lib/spice_rub.rb' "]
   run *cmd
 end
 

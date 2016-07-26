@@ -25,4 +25,4 @@ $defs.push("-std=gnu99")
 #$defs.push("-Wall")
 #$defs.push("-Werror")
 
-create_makefile('spice_rub/spice_rub')
+create_makefile('spice_rub')

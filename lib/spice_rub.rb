@@ -1,1 +1,2 @@
-require 'spice_rub/spice_rub.rb'
+require 'spice_rub/spice_rub'
+

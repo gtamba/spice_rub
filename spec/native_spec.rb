@@ -162,7 +162,7 @@ describe "SpiceRub::Native" do
   describe "Functions that calculate various geometry measures using Kernel Data" do
     before(:all) do
         kernel_pool = SpiceRub::KernelPool.instance
-          kernel_pool.clear! unless kernel_pool.empty?
+        kernel_pool.clear! unless kernel_pool.empty?
 
         kernel_pool.load(TEST_PCK_KERNEL[1])
         kernel_pool.load(TEST_SPK_KERNEL) 

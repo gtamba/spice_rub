@@ -1,7 +1,7 @@
 #TODO : Overrides its to accept function parameters
 require 'nmatrix'
 require './lib/spice_rub'
-#require 'rspec/its'
+require 'rspec/its'
 
 #Include can be moved to separate specs if not used frequently eventually
 include Math
@@ -21,14 +21,6 @@ TEST_POOL = [ TEST_INVALID_KERNEL, TEST_TLS_KERNEL, TEST_SPK_KERNEL, TEST_PCK_KE
 
 
 TEST_INSTRUMENTS = [-999001, -999002]
-#TODO : Overrides its to accept function parameters
-module OverrideSPec
-  def its(*args)
-    
-  end
-
-  RSpec.configure { |c| c.extend self }
-end
 
 ## Custom RSpec matcher ary_be_within() contributed by Victor Shepelev, @zverok
 ## 

@@ -24,5 +24,6 @@ Gem::Specification.new do |gem|
   gem.add_development_dependency 'pry', '~>0.10'
   gem.add_development_dependency 'rubocop', '>= 0.40.0'
   gem.add_development_dependency 'nmatrix', '>= 0.2.1'
+  gem.add_development_dependency 'rspec-its', '>= 1.2.0'
 
 end

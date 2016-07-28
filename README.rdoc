@@ -32,7 +32,7 @@ Compile the gem :
   
 Run test suite to see if everything works :
   
-  rspec
+  bundle exec rake spec
 
 Try out the code without installing the gem :
 
@@ -52,7 +52,9 @@ Basic Time Conversion and Encoding Functions
 
 Time windows for Observer-Target constraints
 
-Basic Ephemerides Functions [In development]
+Basic Ephemerides Functions
+
+All ported CSPICE functions can be accessed by the call `SpiceRub::Native.CSPICE_FUNCTION_NAME`
 
 == License
 

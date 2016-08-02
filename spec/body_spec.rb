@@ -20,7 +20,7 @@ describe SpiceRub::Body do
       subject { SpiceRub::Body.new(399) }
 
       it { is_expected.to be_instance_of(SpiceRub::Body) }
-      its(:id) { is_expected.to be eq 399 }
+      its(:code) { is_expected.to be eq 399 }
       its(:name) { is_expected.to be eq :earth }
     end
 
@@ -28,7 +28,7 @@ describe SpiceRub::Body do
       subject { SpiceRub::Body.new(:moon) }
 
       it { is_expected.to be_instance_of(SpiceRub::Body) }
-      its(:id) { is_expected.to be eq 301 }
+      its(:code) { is_expected.to be eq 301 }
       its(:name) { is_expected.to be eq :moon }
 
     end
@@ -37,7 +37,7 @@ describe SpiceRub::Body do
       subject { SpiceRub::Body.new(:earth, frame: :ECLIPJ2000) }
 
       it { is_expected.to be_instance_of(SpiceRub::Body) }
-      its(:id) { is_expected.to be eq 399 }
+      its(:code) { is_expected.to be eq 399 }
       its(:name) { is_expected.to be eq :earth }
     end
   end   
@@ -48,8 +48,8 @@ describe SpiceRub::Body do
     it { is_expected.to be eq :earth}
   end
 
-  describe "#id" do
-    subject { test_body.id }
+  describe "#code" do
+    subject { test_body.code }
 
     it { is_expected.to be eq 399 }
   end
@@ -213,7 +213,7 @@ describe SpiceRub::Body do
 
       subject { test_body.within_proximity(distance, epoch, [499, 599, :moon]) }
 
-      it { is_expected.to be eq expected }
+      it { is_expected.to eq expected }
     end
     
     context "When checking if any planets are within a certain radial distance" do
@@ -221,7 +221,24 @@ describe SpiceRub::Body do
 
       subject { test_body.within_proximity(distance, epoch, [:planets]) }
 
+      it { is_expected.to eq expected }
+    end
+  end
+
+  describe("#distance_from") do
+    context "when computing euclidean distance between the Moon and the Earth" do
+      let(:expected) {}
+      
+      subject { test_body.distance_from(Body.new(:moon), epoch) }
+
       it { is_expected.to be eq expected }
+    end
+    
+    context "When checking distance between a body and itself" do
+
+      subject { test_body.within_proximity(Body.new(:earth), epoch) }
+
+      it { is_expected.to be eq 0 }
     end
   end
 end

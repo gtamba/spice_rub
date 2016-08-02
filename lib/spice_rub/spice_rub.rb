@@ -15,5 +15,5 @@ require_relative './kernel_pool.rb'
 require_relative './base_point.rb'
 require_relative './cartesian_point.rb'
 require_relative './body.rb'
-
+require_relative './time.rb'
 

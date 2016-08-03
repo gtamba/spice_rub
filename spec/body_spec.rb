@@ -20,16 +20,16 @@ describe SpiceRub::Body do
       subject { SpiceRub::Body.new(399) }
 
       it { is_expected.to be_instance_of(SpiceRub::Body) }
-      its(:code) { is_expected.to be eq 399 }
-      its(:name) { is_expected.to be eq :earth }
+      its(:code) { is_expected.to eq 399 }
+      its(:name) { is_expected.to eq :earth }
     end
 
     context "When instantiating with body symbol name" do
       subject { SpiceRub::Body.new(:moon) }
 
       it { is_expected.to be_instance_of(SpiceRub::Body) }
-      its(:code) { is_expected.to be eq 301 }
-      its(:name) { is_expected.to be eq :moon }
+      its(:code) { is_expected.to eq 301 }
+      its(:name) { is_expected.to eq :moon }
 
     end
 
@@ -37,21 +37,21 @@ describe SpiceRub::Body do
       subject { SpiceRub::Body.new(:earth, frame: :ECLIPJ2000) }
 
       it { is_expected.to be_instance_of(SpiceRub::Body) }
-      its(:code) { is_expected.to be eq 399 }
-      its(:name) { is_expected.to be eq :earth }
+      its(:code) { is_expected.to eq 399 }
+      its(:name) { is_expected.to eq :earth }
     end
   end   
   
   describe "#name" do
     subject { test_body.name }
 
-    it { is_expected.to be eq :earth}
+    it { is_expected.to eq :earth}
   end
 
   describe "#code" do
     subject { test_body.code }
 
-    it { is_expected.to be eq 399 }
+    it { is_expected.to eq 399 }
   end
 
   describe "#type" do

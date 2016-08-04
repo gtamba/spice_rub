@@ -111,7 +111,8 @@ describe SpiceRub::Body do
   describe "#state_at" do
 
     context "When all parameters are specified" do
-      let(:expected) {  NMatrix.new([6,1], [-97579460.22494915, 
+      let(:expected) {  NMatrix.new([6,1], [
+                                            -97579460.22494915, 
                                             -111325884.19041583, 
                                             -53609500.96053864,
                                              191941265.18476546, 
@@ -128,12 +129,12 @@ describe SpiceRub::Body do
     context "When computing state of a body at an epoch" do
       let(:expected) { [
                         NMatrix.new([6,1] , [
-                                            -26468760.60299247,
-                                            132758515.52645776,
-                                             57556706.30607039,
-                                            63115264.183926724,
-                                                             0,
-                                                             0
+                                              -26468760.60299247,
+                                              132758515.52645776,
+                                               57556706.30607039,
+                                              63115264.183926724,
+                                                               0,
+                                                               0
                                             ] ) ,
                         490.6703256499084
                        ]
@@ -163,10 +164,11 @@ describe SpiceRub::Body do
 
   describe "#velocity_at" do
     context "When all parameters are specified" do
-      let(:expected) {  NMatrix.new([3,1], [ 91941265.18476546, 
+      let(:expected) {  NMatrix.new([3,1], [ 
+                                             91941265.18476546, 
                                              0, 
                                              0
-                                           ] ) 
+                                           ]  ) 
                      }
       
       subject { Body.new(:moon).velocity_at("2006 JAN 31 01:00", observer: :MARS, frame: :J2000, aberration_correction: :NONE) }

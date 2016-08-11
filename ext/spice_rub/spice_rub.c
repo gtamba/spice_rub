@@ -129,7 +129,14 @@ void Init_spice_rub() {
   rb_define_module_function(spicerub_nested_module, "scs2e", sr_scs2e, 2);
   rb_define_module_function(spicerub_nested_module, "scdecd", sr_scdecd, 3);
   rb_define_module_function(spicerub_nested_module, "sct2e", sr_sct2e , 2);
-  rb_define_module_function(spicerub_nested_module, "spd", sr_spd, 0);
+  rb_define_module_function(spicerub_nested_module, "deltet", sr_deltet , 2);
+  rb_define_module_function(spicerub_nested_module, "unitim", sr_unitim , 3);
+  rb_define_module_function(spicerub_nested_module, "j1900", sr_j1900, 0);
+  rb_define_module_function(spicerub_nested_module, "j1950", sr_j1950, 0);
+  rb_define_module_function(spicerub_nested_module, "j2000", sr_j2000, 0);
+  rb_define_module_function(spicerub_nested_module, "j2100", sr_j2100, 0);
+  rb_define_module_function(spicerub_nested_module, "b1900", sr_b1900, 0);
+  rb_define_module_function(spicerub_nested_module, "b1950", sr_b1950, 0);
 
   //Attach Ephemerides routines to module
   rb_define_module_function(spicerub_nested_module, "spkpos", sr_spkpos , 5);

@@ -58,7 +58,16 @@ VALUE sr_scs2e(VALUE self, VALUE sc, VALUE sclkch);
 VALUE sr_scdecd(VALUE self, VALUE sc, VALUE sclkdp, VALUE lenout);
 VALUE sr_sct2e(VALUE self, VALUE sc, VALUE sclkdp);
 VALUE sr_gfoclt(VALUE self, VALUE occtyp, VALUE front, VALUE fshape, VALUE fframe, VALUE back, VALUE bshape, VALUE bframe, VALUE abcorr, VALUE obsrvr, VALUE step, VALUE confines);
+VALUE sr_deltet(VALUE self, VALUE epoch, VALUE eptype);
+VALUE sr_unitim(VALUE self, VALUE epoch, VALUE insystem, VALUE outsystem);
+//constants for Time Routines
 VALUE sr_spd(VALUE self);
+VALUE sr_b1900(VALUE self);
+VALUE sr_b1950(VALUE self);
+VALUE sr_j1900(VALUE self);
+VALUE sr_j1950(VALUE self);
+VALUE sr_j2000(VALUE self);
+VALUE sr_j2100(VALUE self);
 
 //Ephemerides Function Declarations
 VALUE sr_spkpos(VALUE self, VALUE targ, VALUE et, VALUE ref, VALUE abcorr, VALUE obs);

@@ -344,3 +344,47 @@ VALUE sr_sct2e(VALUE self, VALUE sc, VALUE sclkdp) {
 
   return DBL2NUM(output);
 }
+
+VALUE sr_j1900(VALUE self) {
+  return DBL2NUM(j1900_c());
+}
+
+VALUE sr_j1950(VALUE self) {
+  return DBL2NUM(j1950_c());
+}
+
+VALUE sr_j2000(VALUE self) {
+  return DBL2NUM(j2000_c());
+}
+
+VALUE sr_j2100(VALUE self) {
+  return DBL2NUM(j2100_c());
+}
+
+VALUE sr_b1900(VALUE self) {
+  return DBL2NUM(b1900_c());
+}
+
+VALUE sr_b1950(VALUE self) {
+  return DBL2NUM(b1950_c());
+}
+
+VALUE sr_deltet(VALUE self, VALUE epoch, VALUE eptype) {
+  double delta;
+  
+  deltet_c(NUM2DBL(epoch), RB_SYM2STR(eptype), &delta);
+
+  if(spice_error(SPICE_ERROR_SHORT)) return Qnil;
+  
+  return DBL2NUM(delta);
+}
+
+VALUE sr_unitim(VALUE self, VALUE epoch, VALUE insystem, VALUE outsystem) {
+  double output;
+  
+  output = unitim_c(NUM2DBL(epoch), RB_SYM2STR(insystem), RB_SYM2STR(outsystem));
+
+  if(spice_error(SPICE_ERROR_SHORT)) return Qnil;
+  
+  return DBL2NUM(output);
+}

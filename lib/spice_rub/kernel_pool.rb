@@ -185,59 +185,59 @@ module SpiceRub
     def clear_path!
       @path = nil
     end
+  end
 
-    # SpiceKernel class, a helper object used by KernelPool to track
-    # kernel files, is not visible outside KernelPool.
-    class SpiceKernel
-      attr_reader :path_to, :loaded
-      
-      alias :path :path_to
-
-      def self.load(kernel)
-        SpiceRub::Native.furnsh(kernel) ? SpiceKernel.new(kernel) : nil
-      end
-
-      def initialize(path)
-        @path_to = path
-        @loaded  = true
-      end
+  # SpiceKernel class, a helper object used by KernelPool to track
+  # kernel files
+  class SpiceKernel
+    attr_reader :path_to, :loaded
     
-      #
-      # call-seq:
-      #     unload! -> TrueClass/FalseClass
-      # 
-      # Unloads the kernel from the kernel pool. Ruby         
-      # interface to unload_c()
-      #
-      # Examples :-
-      #   kernel_pool.pool
-      #     => [#<SpiceRub::KernelPool::SpiceKernel:0x0000000142ed60 @loaded=true, @path_to="spec/data/kernels/naif0011.tls">,
-      #         #<SpiceRub::KernelPool::SpiceKernel:0x00000000aee980 @loaded=true, @path_to="spec/data/kernels/moon_pa_de421_1900-2050.bpc">,
-      #         #<SpiceRub::KernelPool::SpiceKernel:0x00000000a42ef0 @loaded=true, @path_to="spec/data/kernels/de405_1960_2020.bsp">]
-      #
-      #   kernel_pool[0].unload!
-      #     => true
-      #   
-      #   kernel_pool.count
-      #     => 2
-      #   
-      def unload!
-        if SpiceRub::Native.unload(@path_to)
-          @loaded = false
-          true
-        else
-          false
-        end
-      end
-      
-      def loaded?
-        @loaded
-      end
+    alias :path :path_to
 
-      def mark_unloaded
-        @loaded = false 
+    def self.load(kernel)
+      SpiceRub::Native.furnsh(kernel) ? SpiceKernel.new(kernel) : nil
+    end
+
+    def initialize(path)
+      @path_to = path
+      @loaded  = true
+    end
+  
+    #
+    # call-seq:
+    #     unload! -> TrueClass/FalseClass
+    # 
+    # Unloads the kernel from the kernel pool. Ruby         
+    # interface to unload_c()
+    #
+    # Examples :-
+    #   kernel_pool.pool
+    #     => [#<SpiceRub::KernelPool::SpiceKernel:0x0000000142ed60 @loaded=true, @path_to="spec/data/kernels/naif0011.tls">,
+    #         #<SpiceRub::KernelPool::SpiceKernel:0x00000000aee980 @loaded=true, @path_to="spec/data/kernels/moon_pa_de421_1900-2050.bpc">,
+    #         #<SpiceRub::KernelPool::SpiceKernel:0x00000000a42ef0 @loaded=true, @path_to="spec/data/kernels/de405_1960_2020.bsp">]
+    #
+    #   kernel_pool[0].unload!
+    #     => true
+    #   
+    #   kernel_pool.count
+    #     => 2
+    #   
+    def unload!
+      if Native.unload(@path_to)
+        @loaded = false
+        true
+      else
+        false
       end
     end
-    #private_constant :SpiceKernel
+    
+    def loaded?
+      @loaded
+    end
+
+    def mark_unloaded
+      @loaded = false 
+    end
   end
+    #private_constant :SpiceKernel
 end

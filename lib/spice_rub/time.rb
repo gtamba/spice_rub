@@ -17,10 +17,17 @@
 
 module SpiceRub
   class Time
+    include Comparable
     
+    TIME_TUPLE_ORDER = [:year, :month, :day, :hour, :min, :sec]
+    TIME_TUPLE_DEFAULT = [nil, 1, 1, 0, 0, 0]
+    SECONDS_PER_DAY = 86400
+
+    # The Epoch value in TDB seconds after the J2000 epoch
     attr_reader :et
     alias :to_ephemeris_time :et
     alias :to_et :et
+    alias :to_f :et
     
     @@system = :utc
 
@@ -59,23 +66,21 @@ module SpiceRub
     end
     
     def self.from_spacecraft_clock(spacecraft_id, time, encoding: :string)
-      case encoding
-      when :string
-        raise(ArgumentError, "expected spacecraft clock string") unless time.is_a? String
-        raise(ArgumentError, "expected integer spacecraft ID") unless spacecraft_id.is_a? Integer   
+      raise(ArgumentError, "expected integer spacecraft ID") unless spacecraft_id.is_a? Integer   
+
+      case time
+      when String
         new(Native.scs2e(spacecraft_id, time))
-      when :ticks
-        raise(ArgumentError, "expected float encoded spacecraft time (ticks)") unless time.is_a? Float
-        raise(ArgumentError, "expected integer spacecraft ID") unless spacecraft_id.is_a? Integer   
+      when Float, Integer
         new(Native.sct2e(spacecraft_id, time))
       else
-        raise(ArgumentError, "encoding must be :string or :ticks")
+        raise(ArgumentError, "SpaceCraft Clock must be a string or encoded float (ticks)")
       end 
     end
     #alias :from_sc :from_spacecraft_clock
 
     def self.parse(string)
-      new(Native.str2et(string))    
+      new(Native.str2et(string)) 
     end
 
     def self.from_time(time)
@@ -84,21 +89,74 @@ module SpiceRub
     end
     
     def self.from_tuple(*params)
-      order = [:year, :month, :day, :hour, :min, :sec]
-	    components = [nil, 1, 1, 0, 0, 0]
-	
-	    components = order.zip(components, params)
+	    components = TIME_TUPLE_ORDER.zip(TIME_TUPLE_DEFAULT, params)
         .map { |sym, default, val| [sym, val || default] }.to_h
 	    
       new(Native.str2et('%<month>02i/%<day>02i/%<year>04i %<hour>02i:%<min>02i:%<sec>02i' % 
-        components))    
+        components))
     end
 
     def self.now
       et = Native.str2et(::Time.now.utc.to_s)
       new(et)
     end
+
+    def self.time_series(from, to, step: SECONDS_PER_DAY)
+      raise(ArgumentError, "Invalid epochs") unless [from,to].all? { |t| t.is_a? Time }
+      
+      output = [from]
+      
+      until from == to
+        from += step
+        from = to if from > to
+        output << from
+      end
+
+      output
+    end
+
+    def self.linear_time_series(from, to, size)
+      raise(ArgumentError, "Invalid epochs") unless [from,to].all? { |t| t.is_a? Time }
+
+      NMatrix.linspace(from.et, to.et, size)
+        .map { |t| SpiceRub::Time.new(t) }
+    end  
     
+    def +(time)
+      case time
+      when Integer, Float
+        Time.new(self.et + time)
+      when Time
+        Time.new(self.et + time.et)
+      else
+        raise(ArgumentError, "expected operand of seconds or SpiceRub::Time")
+      end  
+    end
+    alias :plus :+
+    
+    def -(time)
+      case time
+      when Integer, Float
+        Time.new(self.et - time)
+      when Time
+        Time.new(self.et - time.et)
+      else
+        raise(ArgumentError, "expected operand of seconds or SpiceRub::Time")
+      end    
+    end
+    alias :minus :-
+
+    def <=>(time)
+      case time
+      when Integer, Float
+        self.et <=> time
+      when Time
+        self.et <=> time.et
+      else
+        raise(ArgumentError, "expected operand of seconds or SpiceRub::Time")
+      end
+    end      
+
     def to_tai
       Native.unitim(@et, :et, :tai)
     end
@@ -127,11 +185,16 @@ module SpiceRub
       @et - Native.deltet(@et, :et)
     end
 
-    def to_string(format = "Wkd Mon DD HR:MN:SC UTC YYYY ::UTC")
-      timout(@et, format, 32)
+    def format(format = "Wkd Mon DD HR:MN:SC UTC YYYY ::UTC")
+      #TODO
+      #Better externally readable format parameter
+      Native.timout(@et, format, 32)    
+    end  
+
+    def to_string
+      Native.timout(@et, "Wkd Mon DD HR:MN:SC UTC YYYY ::UTC", 32)
     end
     alias :to_s :to_string
-
 
     def to_spacecraft_clock(spacecraft_id, encoding: :string)
       raise(ArgumentError, "expected integer spacecraft ID") unless spacecraft_id.is_a? Integer   

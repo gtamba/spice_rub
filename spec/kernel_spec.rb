@@ -31,7 +31,7 @@ describe SpiceRub::KernelPool do
       subject { kernel_pool[0] }
       
       #be_a_instance_of fails for some reason
-      it { is_expected.to be_a (SpiceRub::KernelPool::SpiceKernel) }
+      it { is_expected.to be_a (SpiceRub::SpiceKernel) }
       it { is_expected.to be_loaded }
       
       #its is deprecated 
@@ -89,17 +89,19 @@ describe SpiceRub::KernelPool do
   end
   
   context "When loading all the kernels from @path without specifying folder" do
+    let(:expected) { Dir[File.join(kernel_pool.path, "*.*")].size }
     subject { kernel_pool.load_folder }
     
     #This test output will change as more files are added to spec/data/kernels  
-    it { is_expected.to eq 8 }
+    it { is_expected.to eq expected }
   end
   
   context "When loading all the kernels from a specified folder" do
+    let(:expected) { Dir[File.join(kernel_pool.path, "*.*")].size }
     subject { kernel_pool.load_folder("spec/data/kernels") }
     
     #This test output will change as more files are added to spec/data/kernels  
-    it { is_expected.to eq 8 }
+    it { is_expected.to eq expected }
   end
 
   # Failing test

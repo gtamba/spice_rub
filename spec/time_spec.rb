@@ -9,43 +9,55 @@ require 'spec_helper'
 require 'date'
 
 describe SpiceRub::Time do
-  
 
   describe ".new" do
-    context "When instantiating with a time string representing the year only" do
-      subject { SpiceRub::Time.new("2002") }
+    context "When instantiating with no offset past the J2000 epoch" do
+      subject { SpiceRub::Time.new(0) }
 
-      its(:year)   { is_expected.to be eq 2002 }
-      its(:month)  { is_expected.to be eq 1    }
-      its(:day)    { is_expected.to be eq 1    }
-      its(:hour)   { is_expected.to be eq 0    }
-      its(:minute) { is_expected.to be eq 0    }
-      its(:second) { is_expected.to be eq 0    }
+      its(:et) { is_expected.to be eq 0 }
     end
 
-    context "When instantiating with Year, Month, Day, Hour" do
-      subject { SpiceRub::Time.new(year: 2002, month: 3, day: 3, hour: 0, minute: 0 , second: 0) }
+    context "When instantiating with 0 UTC seconds past the J2000 epoch" do
+      subject { SpiceRub::Time.new(0, seconds: :utc) }
 
-      its(:year)   { is_expected.to be eq 2002 }
-      its(:month)  { is_expected.to be eq 3    }
-      its(:day)    { is_expected.to be eq 3    }
-      its(:minute) { is_expected.to be eq 0    }
-      its(:hour)   { is_expected.to be eq 0    }
-      its(:second) { is_expected.to be eq 0    }
+      its(:et) { is_expected.to be_within(0.0001).of 64.183927 }
+    end
+  end  
+
+  describe ".parse" do
+    context "When instantiating with a time string representing New Year's Eve 2002" do
+      subject { SpiceRub::Time.parse("Jan 1 2002") }
+
+      its(:et) { is_expected.to be_within(0.0001).of 63115264.183926 }
+    end
+
+    context "When instantiating with a time string represeting the Julian Date 34000" do
+      subject { SpiceRub::Time.parse("JD 34000") }
+
+      its(:et) { is_expected.to be_within(0.0001).of -208875887958.81442 }
     end
   end
 
-  describe ".from_date_time" do
+  describe ".at" do
     context "When creating from a DateTime object" do
       subject { SpiceRub::Time.from_date_time(DateTime.new("2004")) }
+      
+      its(:et) { is_expected.to be_within(0.0001).of }
+    end
+    
+    context "When creating from a DateTime object" do
+      subject { SpiceRub::Time.from_date_time(DateTime.new("2004")) }
+      
+      its(:et) { is_expected.to be_within(0.0001).of }
+    end
 
-      its(:year)   { is_expected.to be eq 2004 }
-      its(:month)  { is_expected.to be eq 1    }
-      its(:day)    { is_expected.to be eq 1    }
-      its(:minute) { is_expected.to be eq 0    }
-      its(:hour)   { is_expected.to be eq 0    }
-      its(:second) { is_expected.to be eq 0    }
-    end  
+    context "When creating from a DateTime object" do
+      subject { SpiceRub::Time.from_date_time(DateTime.new("2004")) }
+      
+      its(:et) { is_expected.to be_within(0.0001).of }
+    end
+
+
   end
 
   describe ".from_time" do
@@ -87,18 +99,6 @@ describe SpiceRub::Time do
     end  
   end
 
-  describe ".now" do
-    context "When creating at current time in UTC" do
-      let(:expected) { Time.now }
-
-      subject { SpiceRub::Time.now }
-        
-      its(:year)   { is_expected.to be eq expected.year  }
-      its(:month)  { is_expected.to be eq expected.month }
-      its(:day)    { is_expected.to be eq expected.day   }
-    end 
-  end
-  
   describe "#to_ephemeris_time" do
     subject { SpiceRub::Time.new(year: 2011, month: 2, day: 2).to_ephemeris_time }
       
